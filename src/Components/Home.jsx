@@ -207,11 +207,15 @@ function Home() {
           </Grid>
         </CardContent>
       </Card>
-      <Grid container spacing={2} sx={{ justifyContent: "center", my: "20px" }}>
+      <Grid
+        container
+        spacing={3.5}
+        sx={{ justifyContent: "center", my: 1, px: 2 }}
+      >
         {data?.map((ele) => (
           <>
-            <Grid item xs={12} sm={6} md={4} lg={2.9}>
-              <Card>
+            <Grid item lg={3}>
+              <Card sx={{ boxShadow: "1px 1px 5px 0px grey" }}>
                 <CardContent>
                   <Box className="flexCenterBox">
                     <Typography paragraph={true}>Type :</Typography>
@@ -228,7 +232,9 @@ function Home() {
                     </Typography>
                   </Box>
                   <Box className="flexCenterBox">
-                    <Typography paragraph={true}><b>Order </b>:</Typography>
+                    <Typography paragraph={true}>
+                      <b>Order </b>:
+                    </Typography>
                     <Typography paragraph={true}>
                       <b>{ele.orderid}</b>
                     </Typography>
