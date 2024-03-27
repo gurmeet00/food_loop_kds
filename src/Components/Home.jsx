@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "./Header";
 import {
   Box,
@@ -8,8 +8,12 @@ import {
   Checkbox,
   Divider,
   Fab,
+  FormControl,
   Grid,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -18,6 +22,8 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 function Home() {
+  const [mygrid, setmygrid] = useState(3);
+
   let data = [
     {
       type: "Dining",
@@ -160,7 +166,37 @@ function Home() {
               </Fab>
             </Grid>
             <Grid item xs={12} md={8.5}>
-              <TextField
+              <FormControl
+                color="error"
+                size="small"
+                fullWidth
+                sx={{
+                  fontFamily: "poppins",
+                  width: {
+                    xs: "100%",
+                    md: "30%",
+                  },
+                }}
+              >
+                <InputLabel color="error" id="demo-simple-select-label">
+                  View Layout
+                </InputLabel>
+                <Select
+                  size="small"
+                  color="error"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={mygrid}
+                  label="View Layout"
+                  onChange={(e) => setmygrid(e.target.value)}
+                >
+                  <MenuItem value={12}>1</MenuItem>
+                  <MenuItem value={6}>2</MenuItem>
+                  <MenuItem value={4}>3</MenuItem>
+                  <MenuItem value={3}>4</MenuItem>
+                </Select>
+              </FormControl>
+              {/* <TextField
                 type="text"
                 variant="outlined"
                 size="small"
@@ -182,7 +218,7 @@ function Home() {
                     fontFamily: "poppins",
                   },
                 }}
-              />
+              /> */}
             </Grid>
 
             <Grid item xs={12} md={1}>
@@ -214,7 +250,7 @@ function Home() {
       >
         {data?.map((ele) => (
           <>
-            <Grid item lg={3}>
+            <Grid item lg={mygrid}>
               <Card sx={{ boxShadow: "1px 1px 5px 0px grey" }}>
                 <CardContent>
                   <Box className="flexCenterBox">
