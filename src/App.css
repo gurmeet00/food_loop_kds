@@ -1,10 +1,35 @@
 .App {
   text-align: center;
 }
-
+p{
+  font-family: "poppins" !important;
+  font-size: 14px !important;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.cardDesign{
+  margin: 12px !important;
+  box-shadow:rgba(7, 7, 7, 0.03) 0px 12px 7px 1px, rgba(51, 48, 60, 0.02) 0px 4px 7px 0px, rgba(22, 22, 22, 0.01) 0px 1px 5px 3px !important;
+}
+.orderBox{
+  border:1px solid #cfcfcf !important;
+font-family: "poppins" !important;
+margin: 15px 5px !important;
+
+}
+.customBtn{
+background-color:#F26720 !important;
+color: rgb(255, 255, 255) !important;
+border-radius: 6px !important;
+font-family: "poppins" !important;
+}
+.flexCenterBox{
+  display: flex !important;;
+  justify-content: space-between !important;;
+  align-items :center !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {
