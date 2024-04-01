@@ -10,17 +10,14 @@ import {
   Fab,
   FormControl,
   Grid,
-  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import ReplayIcon from "@mui/icons-material/Replay";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 function Home() {
   const [mygrid, setmygrid] = useState(3);
 
@@ -155,17 +152,27 @@ function Home() {
     },
   ];
 
+  async function getAllUsers() {
+    const data = await axios.get("https://dummyjson.com/products");
+    return data;
+  }
+
+  const { data: newData, isLoading: productLoader } = useQuery({
+    queryKey: ["user"],
+    queryFn: getAllUsers,
+  });
+
   return (
     <>
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={0.5}>
+            <Grid item xs={2} md={0.5}>
               <Fab variant="outlined" className="customBtn" size="small">
                 <ReplayIcon />
               </Fab>
             </Grid>
-            <Grid item xs={12} md={8.5}>
+            <Grid item xs={11} md={8.5}>
               <FormControl
                 color="error"
                 size="small"
@@ -221,17 +228,17 @@ function Home() {
               /> */}
             </Grid>
 
-            <Grid item xs={12} md={1}>
+            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
               <Button variant="contained" className="customBtn" size="small">
                 All
               </Button>
             </Grid>
-            <Grid item xs={12} md={1}>
+            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
               <Button variant="contained" className="customBtn" size="small">
                 Dining
               </Button>
             </Grid>
-            <Grid item xs={12} md={1}>
+            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
               <Button variant="contained" className="customBtn" size="small">
                 Take Away
               </Button>
@@ -250,7 +257,7 @@ function Home() {
       >
         {data?.map((ele) => (
           <>
-            <Grid item lg={mygrid}>
+            <Grid item xs={12} sm={6} md={4} lg={mygrid}>
               <Card sx={{ boxShadow: "1px 1px 5px 0px grey" }}>
                 <CardContent>
                   <Box className="flexCenterBox">
