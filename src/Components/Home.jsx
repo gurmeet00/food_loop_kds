@@ -258,7 +258,9 @@ function Home() {
         {data?.map((ele) => (
           <>
             <Grid item xs={12} sm={6} md={4} lg={mygrid}>
-              <Card sx={{ boxShadow: "1px 1px 5px 0px grey" }}>
+              <Card
+                sx={{ boxShadow: "1px 1px 5px 0px grey", borderRadius: "5px" }}
+              >
                 <CardContent>
                   <Box className="flexCenterBox">
                     <Typography paragraph={true}>Type :</Typography>
