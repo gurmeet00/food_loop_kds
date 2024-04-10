@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import {
   Box,
@@ -18,9 +18,12 @@ import {
 import ReplayIcon from "@mui/icons-material/Replay";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 function Home() {
   const [mygrid, setmygrid] = useState(3);
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  let slug = searchParams.get("slug");
+  let storeId = searchParams.get("id");
   let data = [
     {
       type: "Dining",
@@ -152,18 +155,25 @@ function Home() {
     },
   ];
 
-  async function getAllUsers() {
-    const data = await axios.get("https://dummyjson.com/products");
-    return data;
-  }
+  // async function getAllUsers() {
+  //   const data = await axios.get("https://dummyjson.com/products");
+  //   return data;
+  // }
 
-  const { data: newData, isLoading: productLoader } = useQuery({
-    queryKey: ["user"],
-    queryFn: getAllUsers,
-  });
+  // const { data: newData, isLoading: productLoader } = useQuery({
+  //   queryKey: ["user"],
+  //   queryFn: getAllUsers,
+  // });
+  useEffect(() => {
+    console.log(storeId, slug);
+  }, []);
 
   return (
     <>
+      <h1>
+        {storeId}
+        {slug}
+      </h1>
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
