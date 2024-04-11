@@ -7,21 +7,17 @@ import {
   CardContent,
   Checkbox,
   Divider,
-  Fab,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Typography,
 } from "@mui/material";
-import ReplayIcon from "@mui/icons-material/Replay";
 import axios from "axios";
+import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
+import CachedIcon from "@mui/icons-material/Cached";
 function Home() {
-  const [mygrid, setmygrid] = useState(3);
   const [searchParams, setSearchParams] = useSearchParams();
+  const GridNumber = useSelector((state) => state.data.gridNum);
   let slug = searchParams.get("slug");
   let storeId = searchParams.get("id");
   let data = [
@@ -167,77 +163,21 @@ function Home() {
   useEffect(() => {
     console.log(storeId, slug);
   }, []);
-
   return (
     <>
-      <h1>
-        {storeId}
-        {slug}
-      </h1>
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={2} md={0.5}>
-              <Fab variant="outlined" className="customBtn" size="small">
-                <ReplayIcon />
-              </Fab>
+            <Grid item xs={4} md={1.5}>
+              <Button variant="contained" className="customBtn" size="small">
+                New/Upcoming Orders
+              </Button>
             </Grid>
-            <Grid item xs={11} md={8.5}>
-              <FormControl
-                color="error"
-                size="small"
-                fullWidth
-                sx={{
-                  fontFamily: "poppins",
-                  width: {
-                    xs: "100%",
-                    md: "30%",
-                  },
-                }}
-              >
-                <InputLabel color="error" id="demo-simple-select-label">
-                  View Layout
-                </InputLabel>
-                <Select
-                  size="small"
-                  color="error"
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={mygrid}
-                  label="View Layout"
-                  onChange={(e) => setmygrid(e.target.value)}
-                >
-                  <MenuItem value={12}>1</MenuItem>
-                  <MenuItem value={6}>2</MenuItem>
-                  <MenuItem value={4}>3</MenuItem>
-                  <MenuItem value={3}>4</MenuItem>
-                </Select>
-              </FormControl>
-              {/* <TextField
-                type="text"
-                variant="outlined"
-                size="small"
-                fullWidth
-                color="error"
-                label="Search Order"
-                placeholder="Enter"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end" sx={{ cursor: "pointer" }}>
-                      <CloseIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  width: {
-                    xs: "100%",
-                    md: "30%",
-                    fontFamily: "poppins",
-                  },
-                }}
-              /> */}
+            <Grid item xs={4} md={7.5}>
+              <Button variant="contained" className="customBtn" size="small">
+                Cancel/Void Orders
+              </Button>
             </Grid>
-
             <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
               <Button variant="contained" className="customBtn" size="small">
                 All
@@ -253,10 +193,6 @@ function Home() {
                 Take Away
               </Button>
             </Grid>
-
-            {/* <Grid item xs={12}>
-              <Divider sx={{ my: 1 }} />
-            </Grid> */}
           </Grid>
         </CardContent>
       </Card>
@@ -267,13 +203,15 @@ function Home() {
       >
         {data?.map((ele) => (
           <>
-            <Grid item xs={12} sm={6} md={4} lg={mygrid}>
+            <Grid item xs={12} sm={6} md={4} lg={GridNumber}>
               <Card
                 sx={{ boxShadow: "1px 1px 5px 0px grey", borderRadius: "5px" }}
               >
                 <CardContent>
                   <Box className="flexCenterBox">
-                    <Typography paragraph={true}>Type :</Typography>
+                    <Typography paragraph={true}>
+                      <b>{ele.orderid}</b>
+                    </Typography>
                     <Typography
                       paragraph={true}
                       sx={{
@@ -286,14 +224,7 @@ function Home() {
                       {ele.type}
                     </Typography>
                   </Box>
-                  <Box className="flexCenterBox">
-                    <Typography paragraph={true}>
-                      <b>Order </b>:
-                    </Typography>
-                    <Typography paragraph={true}>
-                      <b>{ele.orderid}</b>
-                    </Typography>
-                  </Box>
+
                   <Box className="flexCenterBox">
                     <Typography paragraph={true}>Customer :</Typography>
                     <Typography paragraph={true}>{ele.customer}</Typography>

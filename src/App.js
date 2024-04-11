@@ -8,22 +8,23 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import persistStore from "redux-persist/es/persistStore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 const persistor = persistStore(store);
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Header />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-    ],
-  },
-]);
 
 function App() {
   const queryClient = new QueryClient();
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Header />,
+      children: [
+        {
+          path: "/",
+          element: <Home />,
+        },
+      ],
+    },
+  ]);
   return (
     <>
       <Provider store={store}>
