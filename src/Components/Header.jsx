@@ -26,20 +26,22 @@ function Header() {
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={10.5}>
+            <Grid item xs={12} sm={8} md={9} lg={10.5}>
               <img src="/logo/loop_logo.gif" alt="logo" width={160} />
             </Grid>
             <Grid
               item
-              xs={1}
-              md={0.5}
+              xs={2}
+              sm={1}
+              md={1}
+              lg={0.5}
               sx={{ textAlign: { xs: "left", md: "center" } }}
             >
               <Fab color="warning" size="small">
                 <CachedIcon />
               </Fab>
             </Grid>
-            <Grid item xs={11} md={1}>
+            <Grid item xs={10} sm={3} md={2} lg={1}>
               <FormControl
                 color="error"
                 size="small"

@@ -18,6 +18,26 @@ import CachedIcon from "@mui/icons-material/Cached";
 function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
   const GridNumber = useSelector((state) => state.data.gridNum);
+  const [all, setAll] = useState(true);
+  const [dining, setDining] = useState(false);
+  const [takeAway, setTakeAway] = useState(false);
+
+  function handleActive(name) {
+    if (name == "all") {
+      setAll(true);
+      setDining(false);
+      setTakeAway(false);
+    } else if (name == "dining") {
+      setAll(false);
+      setDining(true);
+      setTakeAway(false);
+    } else if (name == "takeAway") {
+      setAll(false);
+      setDining(false);
+      setTakeAway(true);
+    }
+  }
+
   let slug = searchParams.get("slug");
   let storeId = searchParams.get("id");
   let data = [
@@ -168,28 +188,70 @@ function Home() {
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={4} md={1.5}>
+            <Grid item xs={12} sm={3.5} md={2.5} lg={2} xl={1.5}>
               <Button variant="contained" className="customBtn" size="small">
                 New/Upcoming Orders
               </Button>
             </Grid>
-            <Grid item xs={4} md={7.5}>
+            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={8.7}>
               <Button variant="contained" className="customBtn" size="small">
                 Cancel/Void Orders
               </Button>
             </Grid>
-            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
-              <Button variant="contained" className="customBtn" size="small">
+            <Grid
+              item
+              xs={4}
+              sm={1.5}
+              md={1}
+              lg={1}
+              xl={0.5}
+              sx={{ textAlign: { xs: "center" } }}
+            >
+              <Button
+                variant={all ? "contained" : "outlined"}
+                // className="customBtn"
+                color="warning"
+                size="small"
+                onClick={() => handleActive("all")}
+              >
                 All
               </Button>
             </Grid>
-            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
-              <Button variant="contained" className="customBtn" size="small">
+            <Grid
+              item
+              xs={4}
+              sm={1.5}
+              md={1}
+              lg={1}
+              xl={0.5}
+              sx={{ textAlign: { xs: "center" } }}
+            >
+              <Button
+                variant={dining ? "contained" : "outlined"}
+                // className="customBtn"
+                color="warning"
+                size="small"
+                onClick={() => handleActive("dining")}
+              >
                 Dining
               </Button>
             </Grid>
-            <Grid item xs={4} md={1} sx={{ textAlign: { xs: "center" } }}>
-              <Button variant="contained" className="customBtn" size="small">
+            <Grid
+              item
+              xs={4}
+              sm={2}
+              md={1.5}
+              lg={1}
+              xl={0.8}
+              sx={{ textAlign: { xs: "center" } }}
+            >
+              <Button
+                variant={takeAway ? "contained" : "outlined"}
+                // className="customBtn"
+                color="warning"
+                size="small"
+                onClick={() => handleActive("takeAway")}
+              >
                 Take Away
               </Button>
             </Grid>
