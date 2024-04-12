@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { setAllOrder, setGridNum } from "./Redux_Store/OrderSlice";
+import { setAllOrder, setGridNum } from "./Redux_Store/Slices/OrderSlice";
 import {
   Card,
   CardContent,
@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 import CachedIcon from "@mui/icons-material/Cached";
 function Header() {
   const dispatch = useDispatch();
-  const GridNumber = useSelector((state) => state.data.gridNum);
+  const GridNumber = useSelector((state: any) => state.orders?.gridNum);
 
   useEffect(() => {
     dispatch(setAllOrder(["Gurmeet"]));

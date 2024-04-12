@@ -1,13 +1,17 @@
 const BASE_URL =
-  //  'https://vendor-backend.server.loopos.ca/api/'
   process.env.NODE_ENV !== "development"
-    ? "https://tamimi-backend.app.scenetech.co/api/"
-    : "http://localhost:6767/api/";
+    ? "https://loopbackendnew.loop.rockymountaintech.co/api/"
+    : "https://loopbackendnew.loop.rockymountaintech.co/api/";
+
+const SOCKET_BASE_URL =
+  process.env.NODE_ENV !== "development"
+    ? "wss://loopbackendnew.loop.rockymountaintech.co"
+    : "wss://localhost:9999";
 
 export const ApiURL = {
   // IMAGE_BASE_URL: 'https://storage.googleapis.com/vendor_management/',
+  STORE_PROFILE_URL: `${BASE_URL}store/profile-web/`,
 };
-
 export enum ApiStatus {
   STATUS_100 = 100, //informational
   STATUS_200 = 200, //successful response/
