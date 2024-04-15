@@ -18,9 +18,6 @@ function Header() {
   const dispatch = useDispatch();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
 
-  useEffect(() => {
-    dispatch(setAllOrder(["Gurmeet"]));
-  }, []);
   return (
     <>
       <Card className="cardDesign">

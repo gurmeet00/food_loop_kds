@@ -15,6 +15,23 @@ export class StoreController {
       //   headers: {
       //     [GConstants.AUTHORIZATION]: `${GConstants.BEARER} ${accessToken}`,
       //   },
-    });
+    })
   }
+  async getStartDay({ _id }:{_id:any}): Promise<ApiResponseClass>{
+      return await GET({
+        url:ApiURL.STORE_START_DAY_URL+_id
+      })
+  }
+
+  async getStoreOrders({ day_id, store_Id }:{day_id:any,store_Id:any}): Promise<ApiResponseClass>{
+    return await GET({
+      url:ApiURL.GET_STORE_ORDERS_URL+day_id+"&store="+store_Id,
+    })
+}
+
+async getStoreVoidOrders({ day_id, store_Id }:{day_id:any,store_Id:any}): Promise<ApiResponseClass>{
+  return await GET({
+    url:ApiURL.GET_VOID_ORDERS_URL+day_id+"&store="+store_Id,
+  })
+}
 }

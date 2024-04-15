@@ -10,6 +10,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import persistStore from "redux-persist/es/persistStore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PageNotFound from "./Components/PageNotFound.tsx";
+import StoreClose from "./Components/StoreClose.tsx";
 const persistor = persistStore(store);
 
 function App() {
@@ -23,11 +24,15 @@ function App() {
           path: "/",
           element: <Home />,
         },
+        {
+          path: "/storeclose",
+          element: <StoreClose />,
+        },
+        {
+          path: "*",
+          element: <PageNotFound />,
+        },
       ],
-    },
-    {
-      path: "*",
-      element: <PageNotFound />,
     },
   ]);
   return (

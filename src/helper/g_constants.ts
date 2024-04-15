@@ -15,5 +15,25 @@ export enum Platform {
   UBER_EATS_POS = "uber_eats_pos",
 }
 
+export function textUpperCase(text: string) {
+  let find = text.includes("_");
+  let nameArray;
+  if (find) {
+    nameArray = text.trim().split("_");
+    console.log("uderScore");
+  } else {
+    nameArray = text.trim().split(" ");
+  }
+  let newNameArray = [];
+  for (let i = 0; i <= nameArray.length - 1; i++) {
+    let found =
+      nameArray[i][0].toUpperCase() +
+      nameArray[i].slice(1, nameArray[i].length);
+    newNameArray.push(found);
+  }
+  let finalName = newNameArray.join(" ");
+  return finalName;
+}
+
 export function splitDateTime(item: string) {}
 

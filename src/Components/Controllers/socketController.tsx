@@ -17,7 +17,7 @@ export class SocketController {
   private NEW_ORDER_DATA_CHANNEL: string = "orders";
   private UPDATE_ORDER_DATA_CHANNEL: string = "updated_order";
 
-  public connect(storeId?: string) {
+  public connect(storeId) {
     try {
       if (!this.isConnected) {
         if (storeId != null && storeId != undefined && storeId != "") {
@@ -51,7 +51,10 @@ export class SocketController {
   }
   public newOrder() {
     this.socket.on("orders", (data) => {
-      console.log(`Order ${data}`);
+      let trackArr = { ...data };
+      console.log("====================================");
+      console.log(trackArr);
+      console.log("====================================");
     });
   }
 
