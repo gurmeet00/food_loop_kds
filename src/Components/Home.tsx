@@ -26,6 +26,7 @@ import {
 import PageNotFound from "./PageNotFound.tsx";
 import moment from "moment-timezone";
 import { SocketController } from "./Controllers/socketController.tsx";
+import ButttonBar from "./ButttonBar.tsx";
 import {
   setAllOrder,
   setAllVoidOrder,
@@ -146,7 +147,7 @@ function Home() {
 
   async function getStoreOrdersData(startDayId) {
     setLoading(true);
-    if (ordersSliceData.length > 0) {
+    if (ordersSliceData?.length > 0) {
       setOrders(ordersSliceData);
     }
 
@@ -171,7 +172,7 @@ function Home() {
 
   async function getStoreVoidOrdersData(startDayId) {
     setLoading(true);
-    if (VoidOrdersSliceData.length > 0) {
+    if (VoidOrdersSliceData?.length > 0) {
       setVoidOrders(VoidOrdersSliceData);
     }
 
@@ -191,137 +192,6 @@ function Home() {
     }
   }
   //==========================================================================================
-
-  // let data = [
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  //   {
-  //     type: "Dining",
-  //     customer: "Walking Customer",
-  //     created_at: "2024-03-27 05:24:25",
-  //     dining: "Table (10)",
-  //     orderid: "# 202403739",
-  //     items: [
-  //       "1 x Spinach Artichoke Dip",
-
-  //       "1 x Tomato Soup",
-
-  //       "1 x Jalapeno Poppers",
-
-  //       "1 x Chicken Noodle Soup",
-  //     ],
-  //   },
-  // ];
 
   // async function getAllUsers() {
   //   const data = await axios.get("https://dummyjson.com/products");
@@ -352,96 +222,21 @@ function Home() {
         <PageNotFound />
       ) : (
         <>
-          <Card className="cardDesign">
-            <CardContent style={{ paddingBottom: "15px" }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={3.5} md={2.5} lg={2} xl={1.5}>
-                  <Button
-                    variant={newOrdersBtn ? "contained" : "outlined"}
-                    size="small"
-                    color="warning"
-                    onClick={() => activeNewOldOrders("newOrder")}
-                  >
-                    New/Upcoming Orders
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={3.5} md={6} lg={7} xl={8.7}>
-                  <Button
-                    variant={cancelOrdersBtn ? "contained" : "outlined"}
-                    // className="customBtn"
-                    size="small"
-                    color="warning"
-                    onClick={() => activeNewOldOrders("cancelOrder")}
-                  >
-                    Cancel/Void Orders
-                  </Button>
-                </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={1.5}
-                  md={1}
-                  lg={1}
-                  xl={0.5}
-                  sx={{ textAlign: { xs: "center" } }}
-                >
-                  <Button
-                    variant={all ? "contained" : "outlined"}
-                    // className="customBtn"
-                    color="warning"
-                    size="small"
-                    onClick={() => handleActive("all")}
-                  >
-                    All
-                  </Button>
-                </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={1.5}
-                  md={1}
-                  lg={1}
-                  xl={0.5}
-                  sx={{ textAlign: { xs: "center" } }}
-                >
-                  <Button
-                    variant={dining ? "contained" : "outlined"}
-                    // className="customBtn"
-                    color="warning"
-                    size="small"
-                    onClick={() => handleActive("dining")}
-                  >
-                    Dining
-                  </Button>
-                </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={2}
-                  md={1.5}
-                  lg={1}
-                  xl={0.8}
-                  sx={{ textAlign: { xs: "center" } }}
-                >
-                  <Button
-                    variant={takeAway ? "contained" : "outlined"}
-                    // className="customBtn"
-                    color="warning"
-                    size="small"
-                    onClick={() => handleActive("takeAway")}
-                  >
-                    Take Away
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+          <ButttonBar
+            activeBtn={handleActive}
+            activeNewOldBtn={activeNewOldOrders}
+            allBtn={all}
+            diningBtn={dining}
+            takeAwayBtn={takeAway}
+            newOrdersBtn={newOrdersBtn}
+            cancelOrdersBtn={cancelOrdersBtn}
+          />
           <Grid container spacing={3.5} sx={{ my: 1, px: 2 }}>
             {loading ? (
               <>
-                <Box sx={{ textAlign: "center", py: "50px" }}>
+                <Grid item xs={12} sx={{ textAlign: "center", py: "50px" }}>
                   <CircularProgress color="warning" />
-                </Box>
+                </Grid>
               </>
             ) : (
               <>
@@ -460,22 +255,28 @@ function Home() {
                         }}
                       >
                         <CardContent>
-                          <Box className="flexCenterBox">
-                            <Typography paragraph={true}>
-                              <b>#{ele?._id}</b>
-                            </Typography>
-                            <Typography
-                              paragraph={true}
-                              sx={{
-                                backgroundColor: "#F26720",
-                                color: "white",
-                                padding: "0px 8px",
-                                borderRadius: "10px",
-                              }}
-                            >
-                              {textUpperCase(ele?.order_type)}
-                            </Typography>
-                          </Box>
+                          <Grid container spacing={1}>
+                            <Grid item xs={8}>
+                              {" "}
+                              <Typography paragraph={true}>
+                                <b>#{ele?._id}</b>
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={4} sx={{ textAlign: "center" }}>
+                              <Typography
+                                paragraph={true}
+                                sx={{
+                                  backgroundColor: "#F26720",
+                                  color: "white",
+                                  padding: "0px 8px",
+                                  borderRadius: "10px",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {textUpperCase(ele?.order_type)}
+                              </Typography>
+                            </Grid>
+                          </Grid>
 
                           <Box className="flexCenterBox">
                             <Typography paragraph={true}>Customer :</Typography>
@@ -494,11 +295,14 @@ function Home() {
                           {ele?.table != null && (
                             <Box className="flexCenterBox">
                               <Typography paragraph={true}>
-                                {ele?.dining ? ele?.dining : "-"}
+                                {ele?.table ? ele?.table?.name : "-"}
                               </Typography>
 
                               <Typography paragraph={true}>
-                                {ele?.dining ? ele?.dining : "-"}
+                                Seats-{" "}
+                                {ele?.table
+                                  ? ele?.table?.sitting_capacity
+                                  : "-"}
                               </Typography>
                             </Box>
                           )}
@@ -519,72 +323,130 @@ function Home() {
                             </Typography>
 
                             <Divider sx={{ mb: 2 }} />
-                            {(ele?.take_away.length > 0
-                              ? ele?.take_away
-                              : ele?.dine_in.length > 0
-                              ? ele?.dine_in
-                              : []
-                            ).map(
-                              (foodItems: Record<string, any>, index: any) => (
-                                <>
-                                  <Box className="flexCenterBox">
-                                    <Typography paragraph={true}>
-                                      {foodItems?.order_id}
-                                    </Typography>
-                                  </Box>
-                                  {foodItems?.product.map(
-                                    (
-                                      productItem: Record<string, any>,
-                                      index: number
-                                    ) => (
-                                      <>
-                                        <Box className="flexCenterBox">
-                                          <Typography paragraph={true}>
-                                            <Checkbox
-                                              defaultChecked
-                                              size="small"
-                                              color="warning"
-                                            />
-                                            {productItem?.quantity +
-                                              " x " +
-                                              productItem?.product?.name}
-                                          </Typography>
-                                          <Typography paragraph={true}>
-                                            {currencySymbol}{" "}
-                                            {productItem?.price?.price}
-                                          </Typography>
-                                        </Box>
-                                      </>
-                                    )
-                                  )}
-
-                                  {/*
-                                  <Typography
-                                    paragraph={true}
-                                    sx={{ mb: "4px" }}
-                                  >
-                                    <Checkbox
-                                      defaultChecked
-                                      size="small"
-                                      color="warning"
-                                    />
-                                    <br />
-                                    {index % 2 != 0 && (
-                                      <Box
-                                        style={{
-                                          fontSize: "10px",
-                                          color: "grey",
-                                          paddingLeft: "40px",
-                                        }}
+                            <Grid container spacing={1}>
+                              {(ele?.take_away?.length > 0
+                                ? ele?.take_away
+                                : ele?.dine_in?.length
+                                ? ele?.dine_in
+                                : []
+                                ? ele?.take_away
+                                : ele?.dine_in?.length > 0
+                                ? ele?.dine_in
+                                : []
+                              ).map(
+                                (
+                                  foodItems: Record<string, any>,
+                                  index: any
+                                ) => (
+                                  <>
+                                    <Grid item xs={12}>
+                                      <Typography
+                                        paragraph={true}
+                                        sx={{ paddingBottom: "0px" }}
                                       >
-                                        1 x Cap katchuo <br />
-                                        1 x Creamer <br />1 x Sugar
-                                      </Box>
-                                    )}
-                                  </Typography> */}
-                                </>
-                              )
-                            )}
+                                        {foodItems?.order_id}
+                                      </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                      {foodItems?.product.map(
+                                        (
+                                          productItem: Record<string, any>,
+                                          index: number
+                                        ) => (
+                                          <>
+                                            <Grid container spacing={1}>
+                                              <Grid xs={12}>
+                                                <Typography
+                                                  paragraph={true}
+                                                  sx={{ marginBottom: "0px" }}
+                                                >
+                                                  <Checkbox
+                                                    defaultChecked
+                                                    size="small"
+                                                    color="warning"
+                                                  />
+                                                  {productItem?.quantity +
+                                                    " x " +
+                                                    productItem?.product?.name}
+                                                </Typography>
+                                              </Grid>
+                                              <Grid
+                                                item
+                                                xs={12}
+                                                style={{
+                                                  fontSize: "14px",
+                                                  color: "grey",
+                                                  paddingLeft: "40px",
+                                                }}
+                                              >
+                                                {productItem?.selected_variants?.map(
+                                                  (
+                                                    selectedVar: Record<
+                                                      string,
+                                                      any
+                                                    >,
+                                                    indexSelectedVar: number
+                                                  ) => (
+                                                    <>
+                                                      <Grid
+                                                        container
+                                                        spacing={1}
+                                                      >
+                                                        <Grid xs={12}>
+                                                          <Typography
+                                                            marginBottom={0}
+                                                            paragraph={true}
+                                                          >
+                                                            <b>
+                                                              {
+                                                                selectedVar
+                                                                  ?.variant_category
+                                                                  ?.name
+                                                              }
+                                                            </b>
+                                                          </Typography>
+                                                        </Grid>
+                                                        <Grid xs={12}>
+                                                          <Typography
+                                                            marginRight={5}
+                                                            paragraph={true}
+                                                          >
+                                                            {selectedVar?.data?.items.map(
+                                                              (
+                                                                item: Record<
+                                                                  any,
+                                                                  any
+                                                                >,
+                                                                itemIndex: number
+                                                              ) => (
+                                                                <>
+                                                                  {" " +
+                                                                    item
+                                                                      ?.item_data
+                                                                      ?.variant_name}
+                                                                  ,
+                                                                </>
+                                                              )
+                                                            )}
+                                                          </Typography>
+                                                        </Grid>
+                                                      </Grid>
+                                                    </>
+                                                  )
+                                                )}
+                                              </Grid>
+                                            </Grid>
+
+                                            <Divider sx={{ my: 2 }} />
+                                          </>
+                                        )
+                                      )}
+                                    </Grid>
+                                  </>
+                                )
+                              )}
+                            </Grid>
                           </Box>
                           {newOrdersBtn && (
                             <Button
