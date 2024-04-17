@@ -20,7 +20,6 @@ export function textUpperCase(text: string) {
   let nameArray;
   if (find) {
     nameArray = text.trim().split("_");
-    console.log("uderScore");
   } else {
     nameArray = text.trim().split(" ");
   }

@@ -17,8 +17,11 @@ import { useQuery } from "@tanstack/react-query";
 import { GToaster } from "../helper/g_toaster.tsx";
 import CachedIcon from "@mui/icons-material/Cached";
 import { useDispatch, useSelector } from "react-redux";
+import TableBarIcon from "@mui/icons-material/TableBar";
+import ChairAltRoundedIcon from "@mui/icons-material/ChairAltRounded";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { StoreController } from "./Controllers/store_controller.tsx";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import {
   setStore,
   setStoreDayDetails,
@@ -27,6 +30,7 @@ import PageNotFound from "./PageNotFound.tsx";
 import moment from "moment-timezone";
 import { SocketController } from "./Controllers/socketController.tsx";
 import ButttonBar from "./ButttonBar.tsx";
+import io, { Socket } from "socket.io-client";
 import {
   setAllOrder,
   setAllVoidOrder,
@@ -36,10 +40,18 @@ const gToaster = new GToaster();
 const storeController = new StoreController();
 const socketController = new SocketController();
 function Home() {
-  const dispatch = useDispatch();
+  const socket: Socket = io(
+    `wss://loopbackendnew.loop.rockymountaintech.co?store=659e6700e0ec95ac62733139`,
+    {
+      transports: ["websocket"],
+      autoConnect: true,
+    }
+  );
+  let dispatch = useDispatch();
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
   const ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
+  console.log(ordersSliceData, "ordersSliceData");
   const VoidOrdersSliceData = useSelector(
     (state: any) => state.orders?.allVoidOrder
   );
@@ -59,13 +71,16 @@ function Home() {
   const [takeAway, setTakeAway] = useState(false);
   const [newOrdersBtn, setNewOrdersBtn] = useState(true);
   const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [connection, setConnection] = useState(false);
   const [voidOrders, setVoidOrders] = useState([]);
+  const [startDayString, setStartDayString] = useState("");
   const [storeDate, setStoreDate] = useState("");
   const [storeTime, setStoreTime] = useState("");
-
+  let ghostOrders: Array<Record<string, any>> = [];
+  console.log(orders);
   //==========================================================================================
   //ACTIVE NEW/OLD FUNCTION
 
@@ -130,9 +145,11 @@ function Home() {
       ) {
         navigate("/storeclose");
       } else {
-        socketController.connect(storeId);
+        // socketController.connect(storeId, ordersSliceData);
+        connect();
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
+        setStartDayString(response.data.data?.day_id);
         getStoreVoidOrdersData(response.data.data?.day_id);
       }
     } else if (response.status == ApiStatus.STATUS_500) {
@@ -147,9 +164,9 @@ function Home() {
 
   async function getStoreOrdersData(startDayId) {
     setLoading(true);
-    if (ordersSliceData?.length > 0) {
-      setOrders(ordersSliceData);
-    }
+    // if (ordersSliceData?.length > 0) {
+    //   setOrders(ordersSliceData);
+    // }
 
     let response = await storeController.getStoreOrders({
       day_id: startDayId,
@@ -159,7 +176,8 @@ function Home() {
 
     if (response.status == ApiStatus.STATUS_200) {
       setOrders(response.data.data);
-      dispatch(setAllOrder(response.data.data));
+      ghostOrders = response.data.data;
+      // dispatch(setAllOrder(response.data.data));
     } else if (response.status == ApiStatus.STATUS_500) {
       gToaster.warning({ title: "500 Server Error" });
     } else {
@@ -193,28 +211,54 @@ function Home() {
   }
   //==========================================================================================
 
-  // async function getAllUsers() {
-  //   const data = await axios.get("https://dummyjson.com/products");
-  //   return data;
-  // }
+  function connect() {
+    if (!connection) {
+      if (storeId != null || storeId != undefined || storeId != "") {
+        socket.connect();
+        console.log("Connect");
+        setConnection(true);
+        updateOrder();
+      }
+    } else {
+      console.log("Already Connected");
+    }
+  }
+  function updateOrder() {
+    socket.on("updated_order", (data) => {
+      console.log(orders, "update order channel before", ghostOrders);
+      let orderData = JSON.parse(JSON.stringify(ghostOrders));
 
-  // const { data: newData, isLoading: productLoader } = useQuery({
-  //   queryKey: ["user"],
-  //   queryFn: getAllUsers,
-  // });
+      let found = orderData.findIndex(
+        (ele: Record<string, any>, index: number) => ele._id == data._id
+      );
+      if (found) {
+        orderData.splice(found, 1, data);
+        ghostOrders = orderData;
+        setOrders(orderData);
+        // dispatch(setAllOrder(orderData));
+      }
+    });
+  }
+
+  function disConnect() {
+    socket.close();
+    socket.removeAllListeners();
+    socket.disconnect();
+    setConnection(false);
+    console.log("Socket Disconnected");
+  }
+
   useEffect(() => {
     if (storeId) {
       getStoreDay();
-      // socketController.connect("659e6700e0ec95ac62733139");
       getStoreProfile();
     } else {
       setNotFound(true);
     }
 
-    // return () => {
-    //   console.log("print ");
-    //   socketController.disConnect();
-    // };
+    return () => {
+      disConnect();
+    };
   }, []);
   return (
     <>
@@ -231,7 +275,8 @@ function Home() {
             newOrdersBtn={newOrdersBtn}
             cancelOrdersBtn={cancelOrdersBtn}
           />
-          <Grid container spacing={3.5} sx={{ my: 1, px: 2 }}>
+
+          <Grid container spacing={1} sx={{ my: 1, px: 2 }}>
             {loading ? (
               <>
                 <Grid item xs={12} sx={{ textAlign: "center", py: "50px" }}>
@@ -240,24 +285,24 @@ function Home() {
               </>
             ) : (
               <>
-                {(newOrdersBtn
-                  ? orders
-                  : cancelOrdersBtn
-                  ? voidOrders
-                  : []
-                )?.map((ele: Record<string, any>) => (
-                  <>
-                    <Grid item xs={12} sm={6} md={4} lg={GridNumber}>
+                <Masonry gutter="5px" columnsCount={GridNumber}>
+                  {(newOrdersBtn
+                    ? orders
+                    : cancelOrdersBtn
+                    ? voidOrders
+                    : []
+                  )?.map((ele: Record<string, any>) => (
+                    <>
                       <Card
                         sx={{
                           boxShadow: "1px 1px 5px 0px grey",
                           borderRadius: "5px",
+                          margin: "10px 0px 10px 10px",
                         }}
                       >
                         <CardContent>
                           <Grid container spacing={1}>
                             <Grid item xs={8}>
-                              {" "}
                               <Typography paragraph={true}>
                                 <b>#{ele?._id}</b>
                               </Typography>
@@ -266,7 +311,7 @@ function Home() {
                               <Typography
                                 paragraph={true}
                                 sx={{
-                                  backgroundColor: "#F26720",
+                                  backgroundColor: "#d81c1c",
                                   color: "white",
                                   padding: "0px 8px",
                                   borderRadius: "10px",
@@ -295,11 +340,15 @@ function Home() {
                           {ele?.table != null && (
                             <Box className="flexCenterBox">
                               <Typography paragraph={true}>
+                                <TableBarIcon sx={{ fontSize: "12px" }} />
                                 {ele?.table ? ele?.table?.name : "-"}
                               </Typography>
 
                               <Typography paragraph={true}>
                                 Seats-{" "}
+                                <ChairAltRoundedIcon
+                                  sx={{ fontSize: "12px" }}
+                                />{" "}
                                 {ele?.table
                                   ? ele?.table?.sitting_capacity
                                   : "-"}
@@ -359,7 +408,9 @@ function Home() {
                                               <Grid xs={12}>
                                                 <Typography
                                                   paragraph={true}
-                                                  sx={{ marginBottom: "0px" }}
+                                                  sx={{
+                                                    marginBottom: "0px",
+                                                  }}
                                                 >
                                                   <Checkbox
                                                     defaultChecked
@@ -460,9 +511,9 @@ function Home() {
                           )}
                         </CardContent>
                       </Card>
-                    </Grid>
-                  </>
-                ))}
+                    </>
+                  ))}
+                </Masonry>
               </>
             )}
           </Grid>
@@ -470,6 +521,16 @@ function Home() {
       )}
     </>
   );
+}
+
+// let ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
+export function GetUpOrder(orderItem: Record<string, any>) {
+  console.log(orderItem, "<<<<<<<");
+  // let allOrder = JSON.parse(JSON.stringify(ordersSliceData));
+  // let found = allOrder.find((ele: Record<string, any>, index: number) => {
+  //   return ele._id === order._id;
+  // });
+  // console.log(found, "mil gya");
 }
 
 export default Home;

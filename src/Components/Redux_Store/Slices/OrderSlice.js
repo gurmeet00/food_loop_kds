@@ -5,7 +5,8 @@ const OrderSlice = createSlice({
   initialState: {
     allOrder: null,
     allVoidOrder: null,
-    gridNum: 3,
+    updateOrder: null,
+    gridNum: 4,
   },
   reducers: {
     setAllOrder(state, action) {
@@ -17,6 +18,10 @@ const OrderSlice = createSlice({
     setGridNum(state, action) {
       state.gridNum = action.payload;
     },
+    // updateSingleOrder(state, action) {
+    //   console.log(action.payload);
+    //   state.updateOrder = action.payload;
+    // },
   },
 });
 

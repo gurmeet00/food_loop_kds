@@ -10,6 +10,8 @@ import io, { Socket } from "socket.io-client";
 import { GConstants } from "../../helper/g_constants.ts";
 import { v4 as uuidv4 } from "uuid";
 import { useSearchParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { GetUpOrder } from "../Home.tsx";
 
 export class SocketController {
   private socket: Socket;
@@ -17,7 +19,7 @@ export class SocketController {
   private NEW_ORDER_DATA_CHANNEL: string = "orders";
   private UPDATE_ORDER_DATA_CHANNEL: string = "updated_order";
 
-  public connect(storeId) {
+  public connect(storeId, allOrdersData) {
     try {
       if (!this.isConnected) {
         if (storeId != null && storeId != undefined && storeId != "") {
@@ -28,9 +30,11 @@ export class SocketController {
               autoConnect: true,
             }
           );
-
+          console.log("====================================");
+          console.log(allOrdersData);
+          console.log("====================================");
           this.isConnected = true;
-          console.log("Connected true");
+          this.updateOrder(allOrdersData);
           this.emit();
           this.newOrder();
         }
@@ -61,6 +65,17 @@ export class SocketController {
   public emit() {
     this.socket.on("emit", (data) => {
       console.log(`EMIT WORKED ${data}`);
+    });
+  }
+  public updateOrder(allOrders) {
+    this.socket.on("updated_order", (data) => {
+      let updatedOrder = { ...data };
+
+      console.log("UPDATE_ORDER", updatedOrder);
+      console.log("all", allOrders);
+      console.log(allOrders.indexOf(updatedOrder));
+
+      // GetUpOrder(updatedOrder);
     });
   }
 }

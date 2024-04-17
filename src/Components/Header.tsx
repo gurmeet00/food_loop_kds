@@ -35,7 +35,7 @@ function Header() {
               sx={{ textAlign: { xs: "left", md: "center" } }}
             >
               <Fab color="warning" size="small">
-                <CachedIcon />
+                <CachedIcon sx={{ fontSize: "20px" }} />
               </Fab>
             </Grid>
             <Grid item xs={10} sm={3} md={2} lg={1}>
@@ -61,10 +61,10 @@ function Header() {
                     dispatch(setGridNum(e.target.value));
                   }}
                 >
-                  <MenuItem value={12}>1</MenuItem>
-                  <MenuItem value={6}>2</MenuItem>
-                  <MenuItem value={4}>3</MenuItem>
-                  <MenuItem value={3}>4</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -75,5 +75,7 @@ function Header() {
     </>
   );
 }
+
+
 
 export default Header;
