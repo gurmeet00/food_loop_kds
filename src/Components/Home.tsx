@@ -51,7 +51,7 @@ function Home() {
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
   const [searchParams, setSearchParams] = useSearchParams();
-  const storeId = searchParams.get("id");
+  const storeId: string = searchParams.get("id");
   const [all, setAll] = useState(true);
   const [dining, setDining] = useState(false);
   const [takeAway, setTakeAway] = useState(false);
@@ -171,6 +171,32 @@ function Home() {
     setLoading(false);
 
     if (response.status == ApiStatus.STATUS_200) {
+      // ADD INCLUDE FOR CHECK ORDER AND FOR CUTT THE ITEM IN TAKE AWAY.
+      response.data.data?.map((obj: Record<string, any>) => {
+        let data = obj?.take_away?.map((item: Record<string, any>) => {
+          let updateProduct = item?.product?.map(
+            (productItem: Record<string, any>) => {
+              productItem.include = false;
+            }
+          );
+          return updateProduct;
+        });
+        return data;
+      });
+
+      // ADD INCLUDE FOR CHECK ORDER AND FOR CUTT THE ITEM IN DINE IN.
+      response.data.data?.map((obj: Record<string, any>) => {
+        let data = obj?.dine_in?.map((item: Record<string, any>) => {
+          let updateProduct = item?.product?.map(
+            (productItem: Record<string, any>) => {
+              productItem.include = false;
+            }
+          );
+          return updateProduct;
+        });
+        return data;
+      });
+
       setOrders(response.data.data);
       ghostOrders = response.data.data;
       // dispatch(setAllOrder(response.data.data));
@@ -203,6 +229,35 @@ function Home() {
     } else {
       gToaster.warning({ title: " Server Error" });
     }
+  }
+
+  //==========================================================================================
+  // EDIT ORDERS
+
+  async function handleCutItem(
+    orderIndex: number,
+    foodItemsIndex: number,
+    productIndex: number,
+    value: boolean,
+    orderType: string
+  ) {
+    let data = JSON.parse(JSON.stringify(orders));
+
+    data[orderIndex][orderType][foodItemsIndex].product[productIndex].include =
+      value;
+
+    // await storeController
+    //   .editOrder({ _id: storeId, body: data })
+    //   .then((response: any) => {
+    //     if (response.status == ApiStatus.STATUS_500) {
+    //       gToaster.warning({ title: "500 Server Error" });
+    //     } else {
+    //       gToaster.warning({ title: " Server Error" });
+    //     }
+    //   });
+
+    setOrders(data);
+    ghostOrders = data;
   }
 
   //==========================================================================================
@@ -306,7 +361,7 @@ function Home() {
                     : cancelOrdersBtn
                     ? voidOrders
                     : []
-                  )?.map((ele: Record<string, any>) => (
+                  )?.map((ele: Record<string, any>, orderIndex: number) => (
                     <>
                       {ele?.order_type
                         .toLowerCase()
@@ -422,135 +477,151 @@ function Home() {
                               <Grid container spacing={1}>
                                 {(ele?.take_away?.length > 0
                                   ? ele?.take_away
-                                  : ele?.dine_in?.length
-                                  ? ele?.dine_in
-                                  : []
-                                  ? ele?.take_away
                                   : ele?.dine_in?.length > 0
                                   ? ele?.dine_in
                                   : []
-                                ).map(
-                                  (
-                                    foodItems: Record<string, any>,
-                                    index: any
-                                  ) => (
-                                    <>
-                                      <Grid item xs={12}>
-                                        <Typography
-                                          paragraph={true}
-                                          sx={{ paddingBottom: "0px" }}
-                                        >
-                                          {foodItems?.order_id}
-                                        </Typography>
-                                      </Grid>
+                                )
+                                  // ? ele?.take_away
+                                  // : ele?.dine_in?.length > 0
+                                  // ? ele?.dine_in
+                                  // : []
+                                  .map(
+                                    (
+                                      foodItems: Record<string, any>,
+                                      foodItemsIndex: number
+                                    ) => (
+                                      <>
+                                        <Grid item xs={12}>
+                                          <Typography
+                                            paragraph={true}
+                                            sx={{ paddingBottom: "0px" }}
+                                          >
+                                            {foodItems?.order_id}
+                                          </Typography>
+                                        </Grid>
 
-                                      <Grid item xs={12}>
-                                        {foodItems?.product.map(
-                                          (
-                                            productItem: Record<string, any>,
-                                            index: number
-                                          ) => (
-                                            <>
-                                              <Grid
-                                                container
-                                                spacing={1}
-                                                className="cardItems"
-                                              >
-                                                <Grid xs={12}>
-                                                  <Typography
-                                                    paragraph={true}
-                                                    sx={{
-                                                      marginBottom: "0px",
+                                        <Grid item xs={12}>
+                                          {foodItems?.product.map(
+                                            (
+                                              productItem: Record<string, any>,
+                                              productIndex: number
+                                            ) => (
+                                              <>
+                                                <Grid
+                                                  container
+                                                  spacing={1}
+                                                  className="cardItems"
+                                                >
+                                                  <Grid xs={12}>
+                                                    <Typography
+                                                      paragraph={true}
+                                                      sx={{
+                                                        marginBottom: "0px",
+                                                        textDecoration:
+                                                          productItem?.include
+                                                            ? "line-through"
+                                                            : "none",
+                                                      }}
+                                                    >
+                                                      {newOrdersBtn && (
+                                                        <Checkbox
+                                                          checked={
+                                                            productItem?.include
+                                                          }
+                                                          size="large"
+                                                          color="warning"
+                                                          onChange={() =>
+                                                            handleCutItem(
+                                                              orderIndex,
+                                                              foodItemsIndex,
+                                                              productIndex,
+                                                              !productItem?.include,
+                                                              ele?.order_type
+                                                            )
+                                                          }
+                                                        />
+                                                      )}
+                                                      {productItem?.quantity +
+                                                        " x " +
+                                                        productItem?.product
+                                                          ?.name}
+                                                    </Typography>
+                                                  </Grid>
+                                                  <Grid
+                                                    item
+                                                    xs={12}
+                                                    style={{
+                                                      fontSize: "14px",
+                                                      color: "#595454",
+                                                      paddingLeft: "40px",
                                                     }}
                                                   >
-                                                    {newOrdersBtn && (
-                                                      <Checkbox
-                                                        defaultChecked
-                                                        size="large"
-                                                        color="warning"
-                                                      />
+                                                    {productItem?.selected_variants?.map(
+                                                      (
+                                                        selectedVar: Record<
+                                                          string,
+                                                          any
+                                                        >,
+                                                        indexSelectedVar: number
+                                                      ) => (
+                                                        <>
+                                                          <Grid
+                                                            container
+                                                            spacing={1}
+                                                          >
+                                                            <Grid xs={12}>
+                                                              <Typography
+                                                                marginBottom={0}
+                                                                paragraph={true}
+                                                              >
+                                                                <b>
+                                                                  {
+                                                                    selectedVar
+                                                                      ?.variant_category
+                                                                      ?.name
+                                                                  }
+                                                                </b>
+                                                              </Typography>
+                                                            </Grid>
+                                                            <Grid xs={12}>
+                                                              <Typography
+                                                                marginRight={5}
+                                                                paragraph={true}
+                                                              >
+                                                                {selectedVar?.data?.items.map(
+                                                                  (
+                                                                    item: Record<
+                                                                      any,
+                                                                      any
+                                                                    >,
+                                                                    itemIndex: number
+                                                                  ) => (
+                                                                    <>
+                                                                      {" " +
+                                                                        item
+                                                                          ?.item_data
+                                                                          ?.variant_name}
+                                                                      ,
+                                                                    </>
+                                                                  )
+                                                                )}
+                                                              </Typography>
+                                                            </Grid>
+                                                          </Grid>
+                                                        </>
+                                                      )
                                                     )}
-                                                    {productItem?.quantity +
-                                                      " x " +
-                                                      productItem?.product
-                                                        ?.name}
-                                                  </Typography>
+                                                  </Grid>
                                                 </Grid>
-                                                <Grid
-                                                  item
-                                                  xs={12}
-                                                  style={{
-                                                    fontSize: "14px",
-                                                    color: "#595454",
-                                                    paddingLeft: "40px",
-                                                  }}
-                                                >
-                                                  {productItem?.selected_variants?.map(
-                                                    (
-                                                      selectedVar: Record<
-                                                        string,
-                                                        any
-                                                      >,
-                                                      indexSelectedVar: number
-                                                    ) => (
-                                                      <>
-                                                        <Grid
-                                                          container
-                                                          spacing={1}
-                                                        >
-                                                          <Grid xs={12}>
-                                                            <Typography
-                                                              marginBottom={0}
-                                                              paragraph={true}
-                                                            >
-                                                              <b>
-                                                                {
-                                                                  selectedVar
-                                                                    ?.variant_category
-                                                                    ?.name
-                                                                }
-                                                              </b>
-                                                            </Typography>
-                                                          </Grid>
-                                                          <Grid xs={12}>
-                                                            <Typography
-                                                              marginRight={5}
-                                                              paragraph={true}
-                                                            >
-                                                              {selectedVar?.data?.items.map(
-                                                                (
-                                                                  item: Record<
-                                                                    any,
-                                                                    any
-                                                                  >,
-                                                                  itemIndex: number
-                                                                ) => (
-                                                                  <>
-                                                                    {" " +
-                                                                      item
-                                                                        ?.item_data
-                                                                        ?.variant_name}
-                                                                    ,
-                                                                  </>
-                                                                )
-                                                              )}
-                                                            </Typography>
-                                                          </Grid>
-                                                        </Grid>
-                                                      </>
-                                                    )
-                                                  )}
-                                                </Grid>
-                                              </Grid>
 
-                                              <Divider sx={{ my: 2 }} />
-                                            </>
-                                          )
-                                        )}
-                                      </Grid>
-                                    </>
-                                  )
-                                )}
+                                                <Divider sx={{ my: 2 }} />
+                                              </>
+                                            )
+                                          )}
+                                        </Grid>
+                                      </>
+                                    )
+                                  )}
                               </Grid>
                             </Grid>
                             {newOrdersBtn && (

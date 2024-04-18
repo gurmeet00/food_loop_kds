@@ -11,7 +11,7 @@ import { GConstants } from "../../helper/g_constants.ts";
 import { v4 as uuidv4 } from "uuid";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { GetUpOrder } from "../Home.tsx";
+// import { GetUpOrder } from "../Home.tsx";
 
 export class SocketController {
   private socket: Socket;
