@@ -11,31 +11,31 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import axios from "axios";
+import moment from "moment-timezone";
+import ButttonBar from "./ButttonBar.tsx";
+import PageNotFound from "./PageNotFound.tsx";
+import io, { Socket } from "socket.io-client";
 import { ApiStatus } from "../api/api_url.ts";
-import { useQuery } from "@tanstack/react-query";
 import { GToaster } from "../helper/g_toaster.tsx";
-import CachedIcon from "@mui/icons-material/Cached";
 import { useDispatch, useSelector } from "react-redux";
-import TableBarIcon from "@mui/icons-material/TableBar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { StoreController } from "./Controllers/store_controller.tsx";
+import TableBarTwoToneIcon from "@mui/icons-material/TableBarTwoTone";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import {
   setStore,
   setStoreDayDetails,
 } from "./Redux_Store/Slices/StoreSlice.js";
-import moment from "moment-timezone";
-import PageNotFound from "./PageNotFound.tsx";
 import ChairAltTwoToneIcon from "@mui/icons-material/ChairAltTwoTone";
 import { SocketController } from "./Controllers/socketController.tsx";
-import ButttonBar from "./ButttonBar.tsx";
-import io, { Socket } from "socket.io-client";
-import {
-  setAllOrder,
-  setAllVoidOrder,
-} from "./Redux_Store/Slices/OrderSlice.js";
 import { textUpperCase } from "../helper/g_constants.ts";
+// import axios from "axios";
+// import { useQuery } from "@tanstack/react-query";
+// import CachedIcon from "@mui/icons-material/Cached";
+// import {
+//   setAllOrder,
+//   setAllVoidOrder,
+// } from "./Redux_Store/Slices/OrderSlice.js";
 const gToaster = new GToaster();
 const storeController = new StoreController();
 const socketController = new SocketController();
@@ -50,20 +50,6 @@ function Home() {
   let dispatch = useDispatch();
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
-  const ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
-  console.log(ordersSliceData, "ordersSliceData");
-  const VoidOrdersSliceData = useSelector(
-    (state: any) => state.orders?.allVoidOrder
-  );
-  const TimeZone = useSelector(
-    (state: any) =>
-      state.store.storeDetail?.store_setting?.general_setting?.time_zone
-        ?.time_zone
-  );
-  const currencySymbol = useSelector(
-    (state: any) =>
-      state?.store?.storeDetail?.store_setting?.general_setting?.currency_symbol
-  );
   const [searchParams, setSearchParams] = useSearchParams();
   const storeId = searchParams.get("id");
   const [all, setAll] = useState(true);
@@ -76,11 +62,21 @@ function Home() {
   const [notFound, setNotFound] = useState(false);
   const [connection, setConnection] = useState(false);
   const [voidOrders, setVoidOrders] = useState([]);
-  const [startDayString, setStartDayString] = useState("");
   const [storeDate, setStoreDate] = useState("");
   const [storeTime, setStoreTime] = useState("");
   let ghostOrders: Array<Record<string, any>> = [];
-  console.log(orders);
+
+  // const ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
+  // console.log(ordersSliceData, "ordersSliceData");
+  // const VoidOrdersSliceData = useSelector(
+  //   (state: any) => state.orders?.allVoidOrder
+  // );
+  // const TimeZone = useSelector(
+  //   (state: any) =>
+  //     state.store.storeDetail?.store_setting?.general_setting?.time_zone
+  //       ?.time_zone
+  // );
+
   //==========================================================================================
   //ACTIVE NEW/OLD FUNCTION
 
@@ -146,11 +142,11 @@ function Home() {
         navigate("/storeclose");
       } else {
         // socketController.connect(storeId, ordersSliceData);
+
         connect();
 
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
-        setStartDayString(response.data.data?.day_id);
         getStoreVoidOrdersData(response.data.data?.day_id);
       }
     } else if (response.status == ApiStatus.STATUS_500) {
@@ -162,7 +158,6 @@ function Home() {
 
   //==========================================================================================
   // GET ORDERS
-
   async function getStoreOrdersData(startDayId) {
     setLoading(true);
     // if (ordersSliceData?.length > 0) {
@@ -188,7 +183,6 @@ function Home() {
 
   //==========================================================================================
   // GET VOID ORDERS
-
   async function getStoreVoidOrdersData(startDayId) {
     setLoading(true);
     // if (VoidOrdersSliceData?.length > 0) {
@@ -210,25 +204,41 @@ function Home() {
       gToaster.warning({ title: " Server Error" });
     }
   }
-  //==========================================================================================
 
+  //==========================================================================================
+  // CONNECTING SOCKET
   function connect() {
     if (!connection) {
       if (storeId != null || storeId != undefined || storeId != "") {
         socket.connect();
         console.log("Connect");
         setConnection(true);
+
+        addOrders();
+
         updateOrder();
       }
     } else {
       console.log("Already Connected");
     }
   }
+
+  //==========================================================================================
+  // ADD CHANNEL OF SOCKET
+  function addOrders() {
+    socket.on("orders", (data) => {
+      let OrderData = JSON.parse(JSON.stringify(ghostOrders));
+      OrderData.unshift(data);
+      ghostOrders = OrderData;
+      setOrders(OrderData);
+    });
+  }
+
+  //==========================================================================================
+  // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
     socket.on("updated_order", (data) => {
-      console.log(orders, "update order channel before", ghostOrders);
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
-
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
@@ -241,6 +251,8 @@ function Home() {
     });
   }
 
+  //==========================================================================================
+  // DISCONNECT CHANNEL OF SOCKET
   function disConnect() {
     socket.close();
     socket.removeAllListeners();
@@ -250,9 +262,11 @@ function Home() {
   }
 
   useEffect(() => {
-    if (storeId) {
-      getStoreDay();
-      getStoreProfile();
+    if (storeId != null || storeId != undefined || storeId != "") {
+      if (connection == false) {
+        getStoreDay();
+        getStoreProfile();
+      }
     } else {
       setNotFound(true);
     }
@@ -312,7 +326,7 @@ function Home() {
                           }}
                         >
                           <CardContent>
-                            <Grid container spacing={1}>
+                            <Grid container spacing={1} className="cardItems">
                               <Grid item xs={8}>
                                 <Typography paragraph={true}>
                                   <b>#{ele?.order_id}</b>
@@ -332,58 +346,78 @@ function Home() {
                                   {textUpperCase(ele?.order_type)}
                                 </Typography>
                               </Grid>
+
+                              <Grid item xs={6}>
+                                <Typography paragraph={true}>
+                                  Customer :
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography
+                                  paragraph={true}
+                                  textAlign={"right"}
+                                >
+                                  {ele?.customer.name}
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography paragraph={true}>
+                                  Created At :
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography
+                                  paragraph={true}
+                                  textAlign={"right"}
+                                >
+                                  {ele?.created_at}
+                                </Typography>
+                              </Grid>
+                              {ele?.table != null && (
+                                <>
+                                  {" "}
+                                  <Grid item xs={6}>
+                                    <Typography paragraph={true}>
+                                      <TableBarTwoToneIcon
+                                        sx={{ fontSize: "23px" }}
+                                      />{" "}
+                                      {ele?.table ? ele?.table?.name : "-"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={6}>
+                                    <Typography
+                                      paragraph={true}
+                                      textAlign={"right"}
+                                    >
+                                      <ChairAltTwoToneIcon
+                                        sx={{ fontSize: "23px" }}
+                                      />{" "}
+                                      Seats-
+                                      {ele?.table
+                                        ? ele?.table?.sitting_capacity
+                                        : "-"}
+                                    </Typography>
+                                  </Grid>
+                                </>
+                              )}
                             </Grid>
 
-                            <Box className="flexCenterBox">
-                              <Typography paragraph={true}>
-                                Customer :
-                              </Typography>
-                              <Typography paragraph={true}>
-                                {ele?.customer.name}
-                              </Typography>
-                            </Box>
-                            <Box className="flexCenterBox">
-                              <Typography paragraph={true}>
-                                Created At :
-                              </Typography>
-                              <Typography paragraph={true}>
-                                {ele?.created_at}
-                              </Typography>
-                            </Box>
-                            {ele?.table != null && (
-                              <Box className="flexCenterBox">
-                                <Typography paragraph={true}>
-                                  <TableBarIcon sx={{ fontSize: "12px" }} />{" "}
-                                  {ele?.table ? ele?.table?.name : "-"}
-                                </Typography>
-
-                                <Typography paragraph={true}>
-                                  <ChairAltTwoToneIcon
-                                    sx={{ fontSize: "14px" }}
-                                  />{" "}
-                                  Seats-
-                                  {ele?.table
-                                    ? ele?.table?.sitting_capacity
-                                    : "-"}
-                                </Typography>
-                              </Box>
-                            )}
-
-                            <Box
+                            <Grid
+                              container
+                              spacing={1}
                               sx={{
                                 backgroundColor: "#f2f2f2a3",
                                 borderRadius: "8px",
                                 padding: "20px",
                                 mb: "10px",
                               }}
+                              className="cardItems"
                             >
-                              {/* <Button variant="outlined" color="warning" size="small">
-                      <VisibilityIcon />
-                    </Button> */}
-                              <Typography paragraph={true}>
-                                <b>Order Items </b>:
-                              </Typography>
-
+                              <Grid item xs={12}>
+                                <Typography paragraph={true}>
+                                  <b>Order Items </b>:
+                                </Typography>
+                              </Grid>
                               <Divider sx={{ mb: 2 }} />
                               <Grid container spacing={1}>
                                 {(ele?.take_away?.length > 0
@@ -417,7 +451,11 @@ function Home() {
                                             index: number
                                           ) => (
                                             <>
-                                              <Grid container spacing={1}>
+                                              <Grid
+                                                container
+                                                spacing={1}
+                                                className="cardItems"
+                                              >
                                                 <Grid xs={12}>
                                                   <Typography
                                                     paragraph={true}
@@ -428,7 +466,7 @@ function Home() {
                                                     {newOrdersBtn && (
                                                       <Checkbox
                                                         defaultChecked
-                                                        size="small"
+                                                        size="large"
                                                         color="warning"
                                                       />
                                                     )}
@@ -443,7 +481,7 @@ function Home() {
                                                   xs={12}
                                                   style={{
                                                     fontSize: "14px",
-                                                    color: "grey",
+                                                    color: "#595454",
                                                     paddingLeft: "40px",
                                                   }}
                                                 >
@@ -514,15 +552,15 @@ function Home() {
                                   )
                                 )}
                               </Grid>
-                            </Box>
+                            </Grid>
                             {newOrdersBtn && (
                               <Button
                                 variant="contained"
                                 className="customBtn"
-                                size="small"
+                                size="large"
                                 fullWidth
                               >
-                                Ready to pick
+                                <b> Ready to pick</b>
                               </Button>
                             )}
                           </CardContent>
@@ -540,14 +578,6 @@ function Home() {
   );
 }
 
-// let ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
-export function GetUpOrder(orderItem: Record<string, any>) {
-  console.log(orderItem, "<<<<<<<");
-  // let allOrder = JSON.parse(JSON.stringify(ordersSliceData));
-  // let found = allOrder.find((ele: Record<string, any>, index: number) => {
-  //   return ele._id === order._id;
-  // });
-  // console.log(found, "mil gya");
-}
+
 
 export default Home;
