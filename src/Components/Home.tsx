@@ -18,7 +18,6 @@ import { GToaster } from "../helper/g_toaster.tsx";
 import CachedIcon from "@mui/icons-material/Cached";
 import { useDispatch, useSelector } from "react-redux";
 import TableBarIcon from "@mui/icons-material/TableBar";
-import ChairAltRoundedIcon from "@mui/icons-material/ChairAltRounded";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { StoreController } from "./Controllers/store_controller.tsx";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
@@ -26,8 +25,9 @@ import {
   setStore,
   setStoreDayDetails,
 } from "./Redux_Store/Slices/StoreSlice.js";
-import PageNotFound from "./PageNotFound.tsx";
 import moment from "moment-timezone";
+import PageNotFound from "./PageNotFound.tsx";
+import ChairAltTwoToneIcon from "@mui/icons-material/ChairAltTwoTone";
 import { SocketController } from "./Controllers/socketController.tsx";
 import ButttonBar from "./ButttonBar.tsx";
 import io, { Socket } from "socket.io-client";
@@ -147,6 +147,7 @@ function Home() {
       } else {
         // socketController.connect(storeId, ordersSliceData);
         connect();
+
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
         setStartDayString(response.data.data?.day_id);
@@ -190,9 +191,9 @@ function Home() {
 
   async function getStoreVoidOrdersData(startDayId) {
     setLoading(true);
-    if (VoidOrdersSliceData?.length > 0) {
-      setVoidOrders(VoidOrdersSliceData);
-    }
+    // if (VoidOrdersSliceData?.length > 0) {
+    //   setVoidOrders(VoidOrdersSliceData);
+    // }
 
     let response = await storeController.getStoreVoidOrders({
       day_id: startDayId,
@@ -202,7 +203,7 @@ function Home() {
 
     if (response.status == ApiStatus.STATUS_200) {
       setVoidOrders(response.data.data);
-      dispatch(setAllVoidOrder(response.data.data));
+      // dispatch(setAllVoidOrder(response.data.data));
     } else if (response.status == ApiStatus.STATUS_500) {
       gToaster.warning({ title: "500 Server Error" });
     } else {
@@ -293,224 +294,240 @@ function Home() {
                     : []
                   )?.map((ele: Record<string, any>) => (
                     <>
-                      <Card
-                        sx={{
-                          boxShadow: "1px 1px 5px 0px grey",
-                          borderRadius: "5px",
-                          margin: "10px 0px 10px 10px",
-                        }}
-                      >
-                        <CardContent>
-                          <Grid container spacing={1}>
-                            <Grid item xs={8}>
-                              <Typography paragraph={true}>
-                                <b>#{ele?._id}</b>
-                              </Typography>
+                      {ele?.order_type
+                        .toLowerCase()
+                        .replace(/\s+/g, "")
+                        .includes(
+                          takeAway
+                            ? "take_away"
+                            : dining
+                            ? "dine_in"
+                            : ele?.order_type
+                        ) && (
+                        <Card
+                          sx={{
+                            boxShadow: "1px 1px 5px 0px grey",
+                            borderRadius: "5px",
+                            margin: "10px 0px 10px 10px",
+                          }}
+                        >
+                          <CardContent>
+                            <Grid container spacing={1}>
+                              <Grid item xs={8}>
+                                <Typography paragraph={true}>
+                                  <b>#{ele?.order_id}</b>
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={4} sx={{ textAlign: "center" }}>
+                                <Typography
+                                  paragraph={true}
+                                  sx={{
+                                    backgroundColor: "#d81c1c",
+                                    color: "white",
+                                    padding: "0px 8px",
+                                    borderRadius: "10px",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  {textUpperCase(ele?.order_type)}
+                                </Typography>
+                              </Grid>
                             </Grid>
-                            <Grid item xs={4} sx={{ textAlign: "center" }}>
-                              <Typography
-                                paragraph={true}
-                                sx={{
-                                  backgroundColor: "#d81c1c",
-                                  color: "white",
-                                  padding: "0px 8px",
-                                  borderRadius: "10px",
-                                  fontSize: "12px",
-                                }}
-                              >
-                                {textUpperCase(ele?.order_type)}
-                              </Typography>
-                            </Grid>
-                          </Grid>
 
-                          <Box className="flexCenterBox">
-                            <Typography paragraph={true}>Customer :</Typography>
-                            <Typography paragraph={true}>
-                              {ele?.customer.name}
-                            </Typography>
-                          </Box>
-                          <Box className="flexCenterBox">
-                            <Typography paragraph={true}>
-                              Created At :
-                            </Typography>
-                            <Typography paragraph={true}>
-                              {ele?.created_at}
-                            </Typography>
-                          </Box>
-                          {ele?.table != null && (
                             <Box className="flexCenterBox">
                               <Typography paragraph={true}>
-                                <TableBarIcon sx={{ fontSize: "12px" }} />
-                                {ele?.table ? ele?.table?.name : "-"}
+                                Customer :
                               </Typography>
-
                               <Typography paragraph={true}>
-                                Seats-{" "}
-                                <ChairAltRoundedIcon
-                                  sx={{ fontSize: "12px" }}
-                                />{" "}
-                                {ele?.table
-                                  ? ele?.table?.sitting_capacity
-                                  : "-"}
+                                {ele?.customer.name}
                               </Typography>
                             </Box>
-                          )}
+                            <Box className="flexCenterBox">
+                              <Typography paragraph={true}>
+                                Created At :
+                              </Typography>
+                              <Typography paragraph={true}>
+                                {ele?.created_at}
+                              </Typography>
+                            </Box>
+                            {ele?.table != null && (
+                              <Box className="flexCenterBox">
+                                <Typography paragraph={true}>
+                                  <TableBarIcon sx={{ fontSize: "12px" }} />{" "}
+                                  {ele?.table ? ele?.table?.name : "-"}
+                                </Typography>
 
-                          <Box
-                            sx={{
-                              backgroundColor: "#f2f2f2a3",
-                              borderRadius: "8px",
-                              padding: "20px",
-                              mb: "10px",
-                            }}
-                          >
-                            {/* <Button variant="outlined" color="warning" size="small">
+                                <Typography paragraph={true}>
+                                  <ChairAltTwoToneIcon
+                                    sx={{ fontSize: "14px" }}
+                                  />{" "}
+                                  Seats-
+                                  {ele?.table
+                                    ? ele?.table?.sitting_capacity
+                                    : "-"}
+                                </Typography>
+                              </Box>
+                            )}
+
+                            <Box
+                              sx={{
+                                backgroundColor: "#f2f2f2a3",
+                                borderRadius: "8px",
+                                padding: "20px",
+                                mb: "10px",
+                              }}
+                            >
+                              {/* <Button variant="outlined" color="warning" size="small">
                       <VisibilityIcon />
                     </Button> */}
-                            <Typography paragraph={true}>
-                              <b>Order Items </b>:
-                            </Typography>
+                              <Typography paragraph={true}>
+                                <b>Order Items </b>:
+                              </Typography>
 
-                            <Divider sx={{ mb: 2 }} />
-                            <Grid container spacing={1}>
-                              {(ele?.take_away?.length > 0
-                                ? ele?.take_away
-                                : ele?.dine_in?.length
-                                ? ele?.dine_in
-                                : []
-                                ? ele?.take_away
-                                : ele?.dine_in?.length > 0
-                                ? ele?.dine_in
-                                : []
-                              ).map(
-                                (
-                                  foodItems: Record<string, any>,
-                                  index: any
-                                ) => (
-                                  <>
-                                    <Grid item xs={12}>
-                                      <Typography
-                                        paragraph={true}
-                                        sx={{ paddingBottom: "0px" }}
-                                      >
-                                        {foodItems?.order_id}
-                                      </Typography>
-                                    </Grid>
+                              <Divider sx={{ mb: 2 }} />
+                              <Grid container spacing={1}>
+                                {(ele?.take_away?.length > 0
+                                  ? ele?.take_away
+                                  : ele?.dine_in?.length
+                                  ? ele?.dine_in
+                                  : []
+                                  ? ele?.take_away
+                                  : ele?.dine_in?.length > 0
+                                  ? ele?.dine_in
+                                  : []
+                                ).map(
+                                  (
+                                    foodItems: Record<string, any>,
+                                    index: any
+                                  ) => (
+                                    <>
+                                      <Grid item xs={12}>
+                                        <Typography
+                                          paragraph={true}
+                                          sx={{ paddingBottom: "0px" }}
+                                        >
+                                          {foodItems?.order_id}
+                                        </Typography>
+                                      </Grid>
 
-                                    <Grid item xs={12}>
-                                      {foodItems?.product.map(
-                                        (
-                                          productItem: Record<string, any>,
-                                          index: number
-                                        ) => (
-                                          <>
-                                            <Grid container spacing={1}>
-                                              <Grid xs={12}>
-                                                <Typography
-                                                  paragraph={true}
-                                                  sx={{
-                                                    marginBottom: "0px",
+                                      <Grid item xs={12}>
+                                        {foodItems?.product.map(
+                                          (
+                                            productItem: Record<string, any>,
+                                            index: number
+                                          ) => (
+                                            <>
+                                              <Grid container spacing={1}>
+                                                <Grid xs={12}>
+                                                  <Typography
+                                                    paragraph={true}
+                                                    sx={{
+                                                      marginBottom: "0px",
+                                                    }}
+                                                  >
+                                                    {newOrdersBtn && (
+                                                      <Checkbox
+                                                        defaultChecked
+                                                        size="small"
+                                                        color="warning"
+                                                      />
+                                                    )}
+                                                    {productItem?.quantity +
+                                                      " x " +
+                                                      productItem?.product
+                                                        ?.name}
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid
+                                                  item
+                                                  xs={12}
+                                                  style={{
+                                                    fontSize: "14px",
+                                                    color: "grey",
+                                                    paddingLeft: "40px",
                                                   }}
                                                 >
-                                                  <Checkbox
-                                                    defaultChecked
-                                                    size="small"
-                                                    color="warning"
-                                                  />
-                                                  {productItem?.quantity +
-                                                    " x " +
-                                                    productItem?.product?.name}
-                                                </Typography>
-                                              </Grid>
-                                              <Grid
-                                                item
-                                                xs={12}
-                                                style={{
-                                                  fontSize: "14px",
-                                                  color: "grey",
-                                                  paddingLeft: "40px",
-                                                }}
-                                              >
-                                                {productItem?.selected_variants?.map(
-                                                  (
-                                                    selectedVar: Record<
-                                                      string,
-                                                      any
-                                                    >,
-                                                    indexSelectedVar: number
-                                                  ) => (
-                                                    <>
-                                                      <Grid
-                                                        container
-                                                        spacing={1}
-                                                      >
-                                                        <Grid xs={12}>
-                                                          <Typography
-                                                            marginBottom={0}
-                                                            paragraph={true}
-                                                          >
-                                                            <b>
-                                                              {
-                                                                selectedVar
-                                                                  ?.variant_category
-                                                                  ?.name
-                                                              }
-                                                            </b>
-                                                          </Typography>
+                                                  {productItem?.selected_variants?.map(
+                                                    (
+                                                      selectedVar: Record<
+                                                        string,
+                                                        any
+                                                      >,
+                                                      indexSelectedVar: number
+                                                    ) => (
+                                                      <>
+                                                        <Grid
+                                                          container
+                                                          spacing={1}
+                                                        >
+                                                          <Grid xs={12}>
+                                                            <Typography
+                                                              marginBottom={0}
+                                                              paragraph={true}
+                                                            >
+                                                              <b>
+                                                                {
+                                                                  selectedVar
+                                                                    ?.variant_category
+                                                                    ?.name
+                                                                }
+                                                              </b>
+                                                            </Typography>
+                                                          </Grid>
+                                                          <Grid xs={12}>
+                                                            <Typography
+                                                              marginRight={5}
+                                                              paragraph={true}
+                                                            >
+                                                              {selectedVar?.data?.items.map(
+                                                                (
+                                                                  item: Record<
+                                                                    any,
+                                                                    any
+                                                                  >,
+                                                                  itemIndex: number
+                                                                ) => (
+                                                                  <>
+                                                                    {" " +
+                                                                      item
+                                                                        ?.item_data
+                                                                        ?.variant_name}
+                                                                    ,
+                                                                  </>
+                                                                )
+                                                              )}
+                                                            </Typography>
+                                                          </Grid>
                                                         </Grid>
-                                                        <Grid xs={12}>
-                                                          <Typography
-                                                            marginRight={5}
-                                                            paragraph={true}
-                                                          >
-                                                            {selectedVar?.data?.items.map(
-                                                              (
-                                                                item: Record<
-                                                                  any,
-                                                                  any
-                                                                >,
-                                                                itemIndex: number
-                                                              ) => (
-                                                                <>
-                                                                  {" " +
-                                                                    item
-                                                                      ?.item_data
-                                                                      ?.variant_name}
-                                                                  ,
-                                                                </>
-                                                              )
-                                                            )}
-                                                          </Typography>
-                                                        </Grid>
-                                                      </Grid>
-                                                    </>
-                                                  )
-                                                )}
+                                                      </>
+                                                    )
+                                                  )}
+                                                </Grid>
                                               </Grid>
-                                            </Grid>
 
-                                            <Divider sx={{ my: 2 }} />
-                                          </>
-                                        )
-                                      )}
-                                    </Grid>
-                                  </>
-                                )
-                              )}
-                            </Grid>
-                          </Box>
-                          {newOrdersBtn && (
-                            <Button
-                              variant="contained"
-                              className="customBtn"
-                              size="small"
-                              fullWidth
-                            >
-                              Ready to pick
-                            </Button>
-                          )}
-                        </CardContent>
-                      </Card>
+                                              <Divider sx={{ my: 2 }} />
+                                            </>
+                                          )
+                                        )}
+                                      </Grid>
+                                    </>
+                                  )
+                                )}
+                              </Grid>
+                            </Box>
+                            {newOrdersBtn && (
+                              <Button
+                                variant="contained"
+                                className="customBtn"
+                                size="small"
+                                fullWidth
+                              >
+                                Ready to pick
+                              </Button>
+                            )}
+                          </CardContent>
+                        </Card>
+                      )}
                     </>
                   ))}
                 </Masonry>
