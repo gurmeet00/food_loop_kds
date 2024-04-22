@@ -26,9 +26,10 @@ import {
   setStore,
   setStoreDayDetails,
 } from "./Redux_Store/Slices/StoreSlice.js";
+import Chip from "@mui/material/Chip";
+import { textUpperCase } from "../helper/g_constants.ts";
 import ChairAltTwoToneIcon from "@mui/icons-material/ChairAltTwoTone";
 import { SocketController } from "./Controllers/socketController.tsx";
-import { textUpperCase } from "../helper/g_constants.ts";
 // import axios from "axios";
 // import { useQuery } from "@tanstack/react-query";
 // import CachedIcon from "@mui/icons-material/Cached";
@@ -51,7 +52,7 @@ function Home() {
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
   const [searchParams, setSearchParams] = useSearchParams();
-  const storeId: string = searchParams.get("id");
+  const storeId = searchParams.get("id");
   const [all, setAll] = useState(true);
   const [dining, setDining] = useState(false);
   const [takeAway, setTakeAway] = useState(false);
@@ -110,6 +111,7 @@ function Home() {
   //==========================================================================================
   // GET STORE PROFILE DATA
   async function getStoreProfile() {
+    setLoading(true);
     let response = await storeController.getStoreDetails({ _id: storeId });
     if (response.status == ApiStatus.STATUS_200) {
       dispatch(setStore(response.data.data));
@@ -155,7 +157,6 @@ function Home() {
       gToaster.warning({ title: " Server Error" });
     }
   }
-
   //==========================================================================================
   // GET ORDERS
   async function getStoreOrdersData(startDayId) {
@@ -176,7 +177,7 @@ function Home() {
         let data = obj?.take_away?.map((item: Record<string, any>) => {
           let updateProduct = item?.product?.map(
             (productItem: Record<string, any>) => {
-              productItem.include = false;
+              productItem.include = productItem.include || false;
             }
           );
           return updateProduct;
@@ -189,7 +190,7 @@ function Home() {
         let data = obj?.dine_in?.map((item: Record<string, any>) => {
           let updateProduct = item?.product?.map(
             (productItem: Record<string, any>) => {
-              productItem.include = false;
+              productItem.include = productItem.include || false;
             }
           );
           return updateProduct;
@@ -232,35 +233,6 @@ function Home() {
   }
 
   //==========================================================================================
-  // EDIT ORDERS
-
-  async function handleCutItem(
-    orderIndex: number,
-    foodItemsIndex: number,
-    productIndex: number,
-    value: boolean,
-    orderType: string
-  ) {
-    let data = JSON.parse(JSON.stringify(orders));
-
-    data[orderIndex][orderType][foodItemsIndex].product[productIndex].include =
-      value;
-
-    // await storeController
-    //   .editOrder({ _id: storeId, body: data })
-    //   .then((response: any) => {
-    //     if (response.status == ApiStatus.STATUS_500) {
-    //       gToaster.warning({ title: "500 Server Error" });
-    //     } else {
-    //       gToaster.warning({ title: " Server Error" });
-    //     }
-    //   });
-
-    setOrders(data);
-    ghostOrders = data;
-  }
-
-  //==========================================================================================
   // CONNECTING SOCKET
   function connect() {
     if (!connection) {
@@ -294,6 +266,7 @@ function Home() {
   function updateOrder() {
     socket.on("updated_order", (data) => {
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
+      console.log(data);
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
@@ -301,6 +274,7 @@ function Home() {
         orderData.splice(found, 1, data);
         ghostOrders = orderData;
         setOrders(orderData);
+        console.log(orderData, "<<<<<");
         // dispatch(setAllOrder(orderData));
       }
     });
@@ -314,6 +288,54 @@ function Home() {
     socket.disconnect();
     setConnection(false);
     console.log("Socket Disconnected");
+  }
+
+  //==========================================================================================
+  // EDIT ORDERS
+
+  async function handleCutItem(
+    orderIndex: number,
+    foodItemsIndex: number,
+    productIndex: number,
+    value: boolean,
+    orderType: string,
+    Id: string
+  ) {
+    console.log(value, orderType, Id);
+    let data = JSON.parse(JSON.stringify(orders));
+
+    data[orderIndex][orderType][foodItemsIndex].product[productIndex].include =
+      value;
+
+    setOrders(data);
+    ghostOrders = data;
+
+    // await storeController
+    //   .updateOrder({ _id: Id, body: data[orderIndex] })
+    //   .then((response: any) => {
+    //     if (response.status == ApiStatus.STATUS_200) {
+    //       console.log(response.data.data);
+    //     } else if (response.status == ApiStatus.STATUS_500) {
+    //       gToaster.warning({ title: "500 Server Error" });
+    //     } else {
+    //       gToaster.warning({ title: " Server Error" });
+    //     }
+    //   });
+  }
+
+  async function handleReadyToPick(obj: Record<string, any>) {
+    console.log(obj);
+    await storeController
+      .readyToPickOrder({ _id: obj._id, obj: obj })
+      .then((response: any) => {
+        if (response.status == ApiStatus.STATUS_200) {
+          console.log(response.data.data);
+        } else if (response.status == ApiStatus.STATUS_500) {
+          gToaster.warning({ title: "500 Server Error" });
+        } else {
+          gToaster.warning({ title: " Server Error" });
+        }
+      });
   }
 
   useEffect(() => {
@@ -362,7 +384,7 @@ function Home() {
                     ? voidOrders
                     : []
                   )?.map((ele: Record<string, any>, orderIndex: number) => (
-                    <>
+                    <React.Fragment key={orderIndex}>
                       {ele?.order_type
                         .toLowerCase()
                         .replace(/\s+/g, "")
@@ -472,8 +494,8 @@ function Home() {
                                 <Typography paragraph={true}>
                                   <b>Order Items </b>:
                                 </Typography>
+                                <Divider sx={{ mb: 2 }} />
                               </Grid>
-                              <Divider sx={{ mb: 2 }} />
                               <Grid container spacing={1}>
                                 {(ele?.take_away?.length > 0
                                   ? ele?.take_away
@@ -490,7 +512,7 @@ function Home() {
                                       foodItems: Record<string, any>,
                                       foodItemsIndex: number
                                     ) => (
-                                      <>
+                                      <React.Fragment key={foodItemsIndex}>
                                         <Grid item xs={12}>
                                           <Typography
                                             paragraph={true}
@@ -506,13 +528,23 @@ function Home() {
                                               productItem: Record<string, any>,
                                               productIndex: number
                                             ) => (
-                                              <>
+                                              <React.Fragment
+                                                key={productIndex}
+                                              >
                                                 <Grid
                                                   container
                                                   spacing={1}
                                                   className="cardItems"
                                                 >
-                                                  <Grid xs={12}>
+                                                  <Grid
+                                                    item
+                                                    xs={12}
+                                                    display={"flex"}
+                                                    justifyContent={
+                                                      "space-between"
+                                                    }
+                                                    alignItems={"center"}
+                                                  >
                                                     <Typography
                                                       paragraph={true}
                                                       sx={{
@@ -536,7 +568,8 @@ function Home() {
                                                               foodItemsIndex,
                                                               productIndex,
                                                               !productItem?.include,
-                                                              ele?.order_type
+                                                              ele?.order_type,
+                                                              ele?._id
                                                             )
                                                           }
                                                         />
@@ -546,6 +579,15 @@ function Home() {
                                                         productItem?.product
                                                           ?.name}
                                                     </Typography>
+                                                    {productItem?.include && (
+                                                      <Chip
+                                                        label="Done"
+                                                        color="success"
+                                                        variant="outlined"
+                                                        size="small"
+                                                        sx={{ float: "right" }}
+                                                      />
+                                                    )}
                                                   </Grid>
                                                   <Grid
                                                     item
@@ -564,12 +606,14 @@ function Home() {
                                                         >,
                                                         indexSelectedVar: number
                                                       ) => (
-                                                        <>
+                                                        <React.Fragment
+                                                          key={indexSelectedVar}
+                                                        >
                                                           <Grid
                                                             container
                                                             spacing={1}
                                                           >
-                                                            <Grid xs={12}>
+                                                            <Grid item xs={12}>
                                                               <Typography
                                                                 marginBottom={0}
                                                                 paragraph={true}
@@ -583,7 +627,7 @@ function Home() {
                                                                 </b>
                                                               </Typography>
                                                             </Grid>
-                                                            <Grid xs={12}>
+                                                            <Grid item xs={12}>
                                                               <Typography
                                                                 marginRight={5}
                                                                 paragraph={true}
@@ -596,30 +640,34 @@ function Home() {
                                                                     >,
                                                                     itemIndex: number
                                                                   ) => (
-                                                                    <>
+                                                                    <React.Fragment
+                                                                      key={
+                                                                        itemIndex
+                                                                      }
+                                                                    >
                                                                       {" " +
                                                                         item
                                                                           ?.item_data
                                                                           ?.variant_name}
                                                                       ,
-                                                                    </>
+                                                                    </React.Fragment>
                                                                   )
                                                                 )}
                                                               </Typography>
                                                             </Grid>
                                                           </Grid>
-                                                        </>
+                                                        </React.Fragment>
                                                       )
                                                     )}
                                                   </Grid>
                                                 </Grid>
 
                                                 <Divider sx={{ my: 2 }} />
-                                              </>
+                                              </React.Fragment>
                                             )
                                           )}
                                         </Grid>
-                                      </>
+                                      </React.Fragment>
                                     )
                                   )}
                               </Grid>
@@ -630,6 +678,7 @@ function Home() {
                                 className="customBtn"
                                 size="large"
                                 fullWidth
+                                onClick={() => handleReadyToPick(ele)}
                               >
                                 <b> Ready to pick</b>
                               </Button>
@@ -637,7 +686,7 @@ function Home() {
                           </CardContent>
                         </Card>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </Masonry>
               </>

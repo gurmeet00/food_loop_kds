@@ -46,10 +46,29 @@ export class StoreController {
       url: ApiURL.GET_VOID_ORDERS_URL + day_id + "&store=" + store_Id,
     });
   }
-  async editOrder({_id,body}:{_id:string,body:Array<Record<string,any>>}) {
-    return await POST({
-      url: ApiURL.EDIT_ORDER_URL+_id,
+  async updateOrder({
+    _id,
+    body,
+  }: {
+    _id: string | null;
+    body: Array<Record<string, any>>;
+  }) {
+    return await PUT({
+      url: ApiURL.UPDATE_ORDER_URL + _id,
       body: body,
+    });
+  }
+
+  async readyToPickOrder({
+    _id,
+    obj,
+  }: {
+    _id: string;
+    obj: Record<string, any>;
+  }) {
+    return await POST({
+      url: ApiURL.READY_TO_PICK_ORDER_URL + _id,
+      body: obj,
     });
   }
 }

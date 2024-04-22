@@ -14,7 +14,8 @@ export const ApiURL = {
   GET_STORE_ORDERS_URL: `${BASE_URL}order/get-kds?id=`,
   STORE_START_DAY_URL: `${BASE_URL}store_end_day/profile/`,
   GET_VOID_ORDERS_URL: `${BASE_URL}order/complete-void-kds?id=`,
-  EDIT_ORDER_URL: `${BASE_URL}order/edit`,
+  UPDATE_ORDER_URL: `${BASE_URL}order/update-by-kds/`,
+  READY_TO_PICK_ORDER_URL: `${BASE_URL}`,
 };
 export enum ApiStatus {
   STATUS_100 = 100, //informational
