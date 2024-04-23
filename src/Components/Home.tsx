@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment-timezone";
+import Chip from "@mui/material/Chip";
 import ButttonBar from "./ButttonBar.tsx";
 import PageNotFound from "./PageNotFound.tsx";
 import io, { Socket } from "socket.io-client";
@@ -26,7 +27,6 @@ import {
   setStore,
   setStoreDayDetails,
 } from "./Redux_Store/Slices/StoreSlice.js";
-import Chip from "@mui/material/Chip";
 import { textUpperCase } from "../helper/g_constants.ts";
 import ChairAltTwoToneIcon from "@mui/icons-material/ChairAltTwoTone";
 import { SocketController } from "./Controllers/socketController.tsx";
@@ -173,6 +173,7 @@ function Home() {
 
     if (response.status == ApiStatus.STATUS_200) {
       // ADD INCLUDE FOR CHECK ORDER AND FOR CUTT THE ITEM IN TAKE AWAY.
+      console.log(response.data.data);
       response.data.data?.map((obj: Record<string, any>) => {
         let data = obj?.take_away?.map((item: Record<string, any>) => {
           let updateProduct = item?.product?.map(
@@ -265,13 +266,20 @@ function Home() {
   // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
     socket.on("updated_order", (data) => {
+      console.log(data, "updated");
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
       console.log(data);
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
+
       if (found) {
-        orderData.splice(found, 1, data);
+        if (data.is_completed || data.is_cancelled) {
+          orderData.splice(found, 1);
+        } else {
+          orderData.splice(found, 1, data);
+        }
+
         ghostOrders = orderData;
         setOrders(orderData);
         console.log(orderData, "<<<<<");
@@ -301,7 +309,6 @@ function Home() {
     orderType: string,
     Id: string
   ) {
-    console.log(value, orderType, Id);
     let data = JSON.parse(JSON.stringify(orders));
 
     data[orderIndex][orderType][foodItemsIndex].product[productIndex].include =
@@ -324,12 +331,11 @@ function Home() {
   }
 
   async function handleReadyToPick(obj: Record<string, any>) {
-    console.log(obj);
     await storeController
-      .readyToPickOrder({ _id: obj._id, obj: obj })
+      .readyToPickOrder({ _id: obj._id })
       .then((response: any) => {
         if (response.status == ApiStatus.STATUS_200) {
-          console.log(response.data.data);
+          console.log(response.data.data, "<<<Ready To Pick Order");
         } else if (response.status == ApiStatus.STATUS_500) {
           gToaster.warning({ title: "500 Server Error" });
         } else {
@@ -386,7 +392,7 @@ function Home() {
                   )?.map((ele: Record<string, any>, orderIndex: number) => (
                     <React.Fragment key={orderIndex}>
                       {ele?.order_type
-                        .toLowerCase()
+                        ?.toLowerCase()
                         .replace(/\s+/g, "")
                         .includes(
                           takeAway
@@ -674,9 +680,16 @@ function Home() {
                             </Grid>
                             {newOrdersBtn && (
                               <Button
+                                disabled={
+                                  ele.track_order[ele.track_order.length - 1]
+                                    .status == "ready_to_pick_up"
+                                    ? true
+                                    : false
+                                }
                                 variant="contained"
-                                className="customBtn"
+                                // className="customBtn"
                                 size="large"
+                                color="warning"
                                 fullWidth
                                 onClick={() => handleReadyToPick(ele)}
                               >

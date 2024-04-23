@@ -59,16 +59,9 @@ export class StoreController {
     });
   }
 
-  async readyToPickOrder({
-    _id,
-    obj,
-  }: {
-    _id: string;
-    obj: Record<string, any>;
-  }) {
-    return await POST({
+  async readyToPickOrder({ _id }: { _id: string }) {
+    return await PUT({
       url: ApiURL.READY_TO_PICK_ORDER_URL + _id,
-      body: obj,
     });
   }
 }
