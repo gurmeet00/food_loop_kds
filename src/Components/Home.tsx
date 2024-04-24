@@ -173,7 +173,7 @@ function Home() {
 
     if (response.status == ApiStatus.STATUS_200) {
       // ADD INCLUDE FOR CHECK ORDER AND FOR CUTT THE ITEM IN TAKE AWAY.
-      console.log(response.data.data);
+
       response.data.data?.map((obj: Record<string, any>) => {
         let data = obj?.take_away?.map((item: Record<string, any>) => {
           let updateProduct = item?.product?.map(
@@ -266,9 +266,8 @@ function Home() {
   // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
     socket.on("updated_order", (data) => {
-      console.log(data, "updated");
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
-      console.log(data);
+
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
@@ -282,7 +281,7 @@ function Home() {
 
         ghostOrders = orderData;
         setOrders(orderData);
-        console.log(orderData, "<<<<<");
+
         // dispatch(setAllOrder(orderData));
       }
     });
@@ -335,7 +334,6 @@ function Home() {
       .readyToPickOrder({ _id: obj._id })
       .then((response: any) => {
         if (response.status == ApiStatus.STATUS_200) {
-          console.log(response.data.data, "<<<Ready To Pick Order");
         } else if (response.status == ApiStatus.STATUS_500) {
           gToaster.warning({ title: "500 Server Error" });
         } else {
@@ -682,7 +680,7 @@ function Home() {
                               <Button
                                 disabled={
                                   ele.track_order[ele.track_order.length - 1]
-                                    .status == "ready_to_pick_up"
+                                    ?.status == "ready_to_pick_up"
                                     ? true
                                     : false
                                 }
