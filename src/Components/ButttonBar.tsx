@@ -9,6 +9,7 @@ function ButttonBar({
   activeNewOldBtn,
   newOrdersBtn,
   cancelOrdersBtn,
+  completeOrdersBtn,
 }) {
   return (
     <>
@@ -25,7 +26,7 @@ function ButttonBar({
                 New/Upcoming Orders
               </Button>
             </Grid>
-            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={8.7}>
+            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={1.3}>
               <Button
                 variant={cancelOrdersBtn ? "contained" : "outlined"}
                 // className="customBtn"
@@ -34,6 +35,17 @@ function ButttonBar({
                 onClick={() => activeNewOldBtn("cancelOrder")}
               >
                 Cancel/Void Orders
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={7.3}>
+              <Button
+                variant={completeOrdersBtn ? "contained" : "outlined"}
+                // className="customBtn"
+                size="small"
+                color="warning"
+                onClick={() => activeNewOldBtn("completeOrder")}
+              >
+                Completed Orders
               </Button>
             </Grid>
             <Grid

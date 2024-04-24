@@ -58,6 +58,7 @@ function Home() {
   const [takeAway, setTakeAway] = useState(false);
   const [newOrdersBtn, setNewOrdersBtn] = useState(true);
   const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
+  const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -85,9 +86,15 @@ function Home() {
     if (name == "newOrder") {
       setNewOrdersBtn(true);
       setCancelOrdersBtn(false);
+      setCompleteOrdersBtn(false);
     } else if (name == "cancelOrder") {
       setNewOrdersBtn(false);
       setCancelOrdersBtn(true);
+      setCompleteOrdersBtn(false);
+    } else if (name == "completeOrder") {
+      setNewOrdersBtn(false);
+      setCancelOrdersBtn(false);
+      setCompleteOrdersBtn(true);
     }
   }
 
@@ -356,6 +363,7 @@ function Home() {
       disConnect();
     };
   }, []);
+  console.log(orders, "orders");
   return (
     <>
       {notFound ? (
@@ -370,6 +378,7 @@ function Home() {
             takeAwayBtn={takeAway}
             newOrdersBtn={newOrdersBtn}
             cancelOrdersBtn={cancelOrdersBtn}
+            completeOrdersBtn={completeOrdersBtn}
           />
 
           <Grid container spacing={1} sx={{ my: 1, px: 2 }}>
@@ -487,10 +496,10 @@ function Home() {
                               container
                               spacing={1}
                               sx={{
-                                backgroundColor: "#f2f2f2a3",
+                                backgroundColor: "#f2f2f299",
                                 borderRadius: "8px",
-                                padding: "20px",
-                                mb: "10px",
+                                padding: "6px 15px",
+                                my: "15px",
                               }}
                               className="cardItems"
                             >
@@ -498,7 +507,7 @@ function Home() {
                                 <Typography paragraph={true}>
                                   <b>Order Items </b>:
                                 </Typography>
-                                <Divider sx={{ mb: 2 }} />
+                                <Divider sx={{ mb: 1 }} />
                               </Grid>
                               <Grid container spacing={1}>
                                 {(ele?.take_away?.length > 0
@@ -517,16 +526,19 @@ function Home() {
                                       foodItemsIndex: number
                                     ) => (
                                       <React.Fragment key={foodItemsIndex}>
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} md={1}>
                                           <Typography
-                                            paragraph={true}
-                                            sx={{ paddingBottom: "0px" }}
+                                            sx={{
+                                              paddingBottom: "0px",
+                                              mb: "0px",
+                                              pt: "8px",
+                                            }}
                                           >
-                                            {foodItems?.order_id}
+                                            <b>{foodItems?.order_id}</b>
                                           </Typography>
                                         </Grid>
 
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} md={11}>
                                           {foodItems?.product.map(
                                             (
                                               productItem: Record<string, any>,
@@ -564,7 +576,7 @@ function Home() {
                                                           checked={
                                                             productItem?.include
                                                           }
-                                                          size="large"
+                                                          size="medium"
                                                           color="warning"
                                                           onChange={() =>
                                                             handleCutItem(
@@ -599,9 +611,194 @@ function Home() {
                                                     style={{
                                                       fontSize: "14px",
                                                       color: "#595454",
-                                                      paddingLeft: "40px",
+                                                      paddingLeft: "20px",
                                                     }}
                                                   >
+                                                    {productItem?.selected_pizza_variants !=
+                                                      null && (
+                                                      <Grid
+                                                        container
+                                                        spacing={0}
+                                                      >
+                                                        <Grid item xs={12}>
+                                                          <span className="primaryColor">
+                                                            <b> Category</b>
+                                                          </span>
+                                                          <span className="selectedPizzaVariants">
+                                                            {` : ${productItem?.selected_pizza_variants.category_id.category_name}`}
+                                                          </span>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                        </Grid>
+                                                        <Grid item xs={2}>
+                                                          <span className="primaryColor">
+                                                            <b>All Size : </b>
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={10}>
+                                                          <span className="selectedPizzaVariants">
+                                                            {`${productItem?.selected_pizza_variants.size?.size?.name}`}
+                                                          </span>
+                                                        </Grid>
+                                                        {/* {SELECTED VARIANT PIZZA} */}
+                                                        <Grid item xs={12}>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                          <span className="primaryColor">
+                                                            <b>Sauce Items</b>
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          <span className="selectedPizzaVariants">
+                                                            {productItem?.selected_pizza_variants.size?.data?.sauces?.map(
+                                                              (
+                                                                sauceItem: Record<
+                                                                  string,
+                                                                  any
+                                                                >
+                                                              ) => (
+                                                                <>
+                                                                  <b>
+                                                                    {`${sauceItem.sauce_category.category_name} : `}
+                                                                  </b>
+                                                                  {sauceItem.data?.sauce_items?.map(
+                                                                    (
+                                                                      sItem: Record<
+                                                                        string,
+                                                                        any
+                                                                      >
+                                                                    ) =>
+                                                                      sItem
+                                                                        ?.sauce_item_data
+                                                                        ?.name
+                                                                  )}
+                                                                </>
+                                                              )
+                                                            )}
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                          <span className="primaryColor">
+                                                            <b>Topping Items</b>
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          {productItem?.selected_pizza_variants.size?.data?.topping?.map(
+                                                            (
+                                                              toppingItem: Record<
+                                                                string,
+                                                                any
+                                                              >
+                                                            ) => (
+                                                              <>
+                                                                <span
+                                                                  style={{
+                                                                    width:
+                                                                      "100%",
+                                                                  }}
+                                                                >
+                                                                  <b>
+                                                                    {`${toppingItem.topping_category.category_name} : `}
+                                                                  </b>
+                                                                  {toppingItem.data?.toppings_items?.map(
+                                                                    (
+                                                                      toppItem: Record<
+                                                                        string,
+                                                                        any
+                                                                      >
+                                                                    ) =>
+                                                                      " " +
+                                                                      toppItem
+                                                                        ?.topping_item_data
+                                                                        ?.name +
+                                                                      ","
+                                                                  )}
+                                                                </span>
+                                                                <br />
+                                                              </>
+                                                            )
+                                                          )}
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                          <span className="primaryColor">
+                                                            <b>Crust Items</b>
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          <span className="selectedPizzaVariants">
+                                                            <b>{`
+                                                              ${productItem?.selected_pizza_variants.size?.data?.crust?.crust_data.name} : `}</b>
+                                                          </span>
+                                                          <span>
+                                                            {
+                                                              productItem
+                                                                ?.selected_pizza_variants
+                                                                .size?.data
+                                                                ?.crust?.data
+                                                                .crust_name
+                                                            }
+                                                          </span>
+                                                        </Grid>
+
+                                                        <Grid item xs={12}>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                          <span className="primaryColor">
+                                                            <b>Cheese Items</b>
+                                                          </span>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                          {productItem?.selected_pizza_variants.size?.data?.cheese?.map(
+                                                            (
+                                                              cheeseItem: Record<
+                                                                string,
+                                                                any
+                                                              >
+                                                            ) => (
+                                                              <>
+                                                                <span
+                                                                  style={{
+                                                                    width:
+                                                                      "100%",
+                                                                  }}
+                                                                >
+                                                                  <b>
+                                                                    {`${cheeseItem.cheese_category.category_name} : `}
+                                                                  </b>
+                                                                  {cheeseItem.data?.cheese_items?.map(
+                                                                    (
+                                                                      cheeItem: Record<
+                                                                        string,
+                                                                        any
+                                                                      >
+                                                                    ) =>
+                                                                      " " +
+                                                                      cheeItem
+                                                                        ?.cheese_item_data
+                                                                        ?.name +
+                                                                      ","
+                                                                  )}
+                                                                </span>
+                                                                <br />
+                                                              </>
+                                                            )
+                                                          )}
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                        </Grid>
+                                                      </Grid>
+                                                    )}
+                                                    {/* //SELECTED VARIANT */}
                                                     {productItem?.selected_variants?.map(
                                                       (
                                                         selectedVar: Record<
@@ -620,7 +817,6 @@ function Home() {
                                                             <Grid item xs={12}>
                                                               <Typography
                                                                 marginBottom={0}
-                                                                paragraph={true}
                                                               >
                                                                 <b>
                                                                   {
@@ -634,6 +830,7 @@ function Home() {
                                                             <Grid item xs={12}>
                                                               <Typography
                                                                 marginRight={5}
+                                                                mt={"-5px"}
                                                                 paragraph={true}
                                                               >
                                                                 {selectedVar?.data?.items.map(
@@ -665,8 +862,6 @@ function Home() {
                                                     )}
                                                   </Grid>
                                                 </Grid>
-
-                                                <Divider sx={{ my: 2 }} />
                                               </React.Fragment>
                                             )
                                           )}
