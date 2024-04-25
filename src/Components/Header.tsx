@@ -20,7 +20,6 @@ function Header() {
   const dispatch = useDispatch();
   const totalOrders = useSelector((state: any) => state.orders.totalOrder);
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
-  console.log(totalOrders);
   return (
     <>
       <Card className="cardDesign">

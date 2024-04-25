@@ -60,7 +60,10 @@ function Home() {
   const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
   const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [btnIndex, setBtnIndex] = useState<number>();
   const [loading, setLoading] = useState(false);
+  const [notifyloading, setNotifyLoading] = useState(false);
+  const [readyToPickLoading, setReadyToPickLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [connection, setConnection] = useState(false);
   const [voidOrders, setVoidOrders] = useState([]);
@@ -142,24 +145,24 @@ function Home() {
   //==========================================================================================
   // GET STORE DAY ID
   async function getStoreDay() {
+    console.log("store day");
     let response = await storeController.getStartDay({ _id: storeId });
     if (response.status == ApiStatus.STATUS_200) {
       if (
-        response.data.data?.day_id == null ||
-        response.data.data?.day_id == undefined ||
-        response.data.data?.day_id == false
+        response.data.data?.day_id != null ||
+        response.data.data?.day_id != undefined ||
+        response.data.data?.day_id != false
       ) {
-        navigate("/storeclose");
-      } else {
         // socketController.connect(storeId, ordersSliceData);
         //IF WE GET STORE DAY ID, MEANS STORE IS OPEN THEN CONNECT SOCKET & PASS DAY_ID TO API USE TO GET ALL ORDER, VOID AND COMPLETED ORDERS.
-
-        connect();
 
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
         getStoreCompleteOrdersData(response.data.data?.day_id);
         getStoreVoidOrdersData(response.data.data?.day_id);
+        connect();
+      } else {
+        navigate("/storeclose");
       }
     } else if (response.status == ApiStatus.STATUS_500) {
       gToaster.warning({ title: "500 Server Error" });
@@ -289,24 +292,34 @@ function Home() {
   function addOrders() {
     socket.on("orders", (data) => {
       let OrderData = JSON.parse(JSON.stringify(ghostOrders));
-      console.log(OrderData);
+
       OrderData.unshift(data);
       ghostOrders = OrderData;
       setOrders(OrderData);
       dispatch(setTotalOrder(OrderData.length));
+      // let found = OrderData.includes(
+      //   (ele: Record<string, any>) => ele._id == data._id
+      // );
+      // console.log(found);
+      // if (!found) {
+      //   OrderData.unshift(data);
+      //   ghostOrders = OrderData;
+      //   setOrders(OrderData);
+      //   dispatch(setTotalOrder(OrderData.length));
+      // }
     });
   }
 
   //==========================================================================================
   // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
-    console.log("updated_order");
     socket.on("updated_order", (data) => {
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
+      console.log(data, "update this");
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
-
+      console.log(found, "index");
       if (found) {
         if (data.is_completed || data.is_cancelled) {
           orderData.splice(found, 1);
@@ -365,10 +378,15 @@ function Home() {
   }
 
   // API FOR ACCEPT ORDER BY CHEF
-  async function handleAcceptOrder(obj: Record<string, any>) {
+  async function handleAcceptOrder(obj: Record<string, any>, index: number) {
+    setNotifyLoading(true);
+    setBtnIndex(index);
+    console.log(index);
+
     await storeController
       .accpetOrder({ _id: obj._id })
       .then((response: any) => {
+        setNotifyLoading(false);
         if (response.status == ApiStatus.STATUS_200) {
         } else if (response.status == ApiStatus.STATUS_500) {
           gToaster.warning({ title: "500 Server Error" });
@@ -376,13 +394,18 @@ function Home() {
           gToaster.warning({ title: " Server Error" });
         }
       });
-    console.log(obj);
   }
 
-  async function handleReadyToPick(obj: Record<string, any>) {
+  async function handleReadyToPick(obj: Record<string, any>, index: number) {
+    setBtnIndex(index);
+    console.log(index);
+    setReadyToPickLoading(true);
+
     await storeController
       .readyToPickOrder({ _id: obj._id })
       .then((response: any) => {
+        setReadyToPickLoading(false);
+
         if (response.status == ApiStatus.STATUS_200) {
         } else if (response.status == ApiStatus.STATUS_500) {
           gToaster.warning({ title: "500 Server Error" });
@@ -398,6 +421,7 @@ function Home() {
       getStoreProfile();
     } else {
       setNotFound(true);
+      disConnect();
     }
 
     return () => {
@@ -707,7 +731,11 @@ function Home() {
                                                                   >,
                                                                   sauceIndex: number
                                                                 ) => (
-                                                                  <>
+                                                                  <React.Fragment
+                                                                    key={
+                                                                      sauceIndex
+                                                                    }
+                                                                  >
                                                                     <b>
                                                                       {`${sauceItem.sauce_category.category_name} : `}
                                                                     </b>
@@ -722,7 +750,7 @@ function Home() {
                                                                           ?.sauce_item_data
                                                                           ?.name
                                                                     )}
-                                                                  </>
+                                                                  </React.Fragment>
                                                                 )
                                                               )}
                                                             </span>
@@ -737,9 +765,14 @@ function Home() {
                                                                 toppingItem: Record<
                                                                   string,
                                                                   any
-                                                                >
+                                                                >,
+                                                                toppingIndex: number
                                                               ) => (
-                                                                <>
+                                                                <React.Fragment
+                                                                  key={
+                                                                    toppingIndex
+                                                                  }
+                                                                >
                                                                   <span
                                                                     style={{
                                                                       width:
@@ -764,7 +797,7 @@ function Home() {
                                                                     )}
                                                                   </span>
                                                                   <br />
-                                                                </>
+                                                                </React.Fragment>
                                                               )
                                                             )}
 
@@ -798,9 +831,14 @@ function Home() {
                                                                 cheeseItem: Record<
                                                                   string,
                                                                   any
-                                                                >
+                                                                >,
+                                                                cheeseIndex: number
                                                               ) => (
-                                                                <>
+                                                                <React.Fragment
+                                                                  key={
+                                                                    cheeseIndex
+                                                                  }
+                                                                >
                                                                   <span
                                                                     style={{
                                                                       width:
@@ -825,7 +863,7 @@ function Home() {
                                                                     )}
                                                                   </span>
                                                                   <br />
-                                                                </>
+                                                                </React.Fragment>
                                                               )
                                                             )}
                                                           </Grid>
@@ -921,47 +959,75 @@ function Home() {
                               {newOrdersBtn && (
                                 <>
                                   <Grid container spacing={1}>
-                                    <Grid item xs={12} md={6}>
-                                      <Button
-                                        disabled={
-                                          ele.track_order[
-                                            ele.track_order.length - 1
-                                          ]?.status == "ready_to_pick_up" ||
-                                          ele.is_new == false
-                                            ? true
-                                            : false
-                                        }
-                                        variant="contained"
-                                        // className="customBtn"
-                                        size="large"
-                                        color="error"
-                                        fullWidth
-                                        onClick={() => handleAcceptOrder(ele)}
-                                      >
-                                        <VisibilitySharpIcon /> &nbsp;
-                                        <b> Order Notifed</b>
-                                      </Button>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                      <Button
-                                        disabled={
-                                          ele.track_order[
-                                            ele.track_order.length - 1
-                                          ]?.status == "ready_to_pick_up"
-                                            ? true
-                                            : false
-                                        }
-                                        variant="contained"
-                                        // className="customBtn"
-                                        size="large"
-                                        color="warning"
-                                        fullWidth
-                                        onClick={() => handleReadyToPick(ele)}
-                                      >
-                                        <AlarmOnSharpIcon /> &nbsp;
-                                        <b> Ready to pick</b>
-                                      </Button>
-                                    </Grid>
+                                    {ele.is_new ? (
+                                      <Grid item xs={12} textAlign={"center"}>
+                                        {btnIndex == orderIndex &&
+                                        notifyloading ? (
+                                          <CircularProgress color="warning" />
+                                        ) : (
+                                          <>
+                                            <Button
+                                              disabled={
+                                                ele.track_order[
+                                                  ele.track_order.length - 1
+                                                ]?.status ==
+                                                  "ready_to_pick_up" ||
+                                                ele.is_new == false
+                                                  ? true
+                                                  : false
+                                              }
+                                              variant="contained"
+                                              // className="customBtn"
+                                              size="large"
+                                              color="error"
+                                              fullWidth
+                                              onClick={() =>
+                                                handleAcceptOrder(
+                                                  ele,
+                                                  orderIndex
+                                                )
+                                              }
+                                            >
+                                              <VisibilitySharpIcon /> &nbsp;
+                                              <b> Order Notifed</b>
+                                            </Button>
+                                          </>
+                                        )}
+                                      </Grid>
+                                    ) : (
+                                      <Grid item xs={12} textAlign={"center"}>
+                                        {btnIndex == orderIndex &&
+                                        readyToPickLoading ? (
+                                          <CircularProgress color="warning" />
+                                        ) : (
+                                          <>
+                                            <Button
+                                              disabled={
+                                                ele.track_order[
+                                                  ele.track_order.length - 1
+                                                ]?.status == "ready_to_pick_up"
+                                                  ? true
+                                                  : false
+                                              }
+                                              variant="contained"
+                                              // className="customBtn"
+                                              size="large"
+                                              color="warning"
+                                              fullWidth
+                                              onClick={() =>
+                                                handleReadyToPick(
+                                                  ele,
+                                                  orderIndex
+                                                )
+                                              }
+                                            >
+                                              <AlarmOnSharpIcon /> &nbsp;
+                                              <b> Ready to pick</b>
+                                            </Button>
+                                          </>
+                                        )}
+                                      </Grid>
+                                    )}
                                   </Grid>
                                 </>
                               )}
