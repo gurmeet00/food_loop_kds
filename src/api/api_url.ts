@@ -7,6 +7,9 @@ export const ApiURL = {
   // IMAGE_BASE_URL: 'https://storage.googleapis.com/vendor_management/',
   STORE_PROFILE_URL: `${SOCKET_BASE_URL}store/profile-web/`,
   GET_STORE_ORDERS_URL: `${SOCKET_BASE_URL}order/get-kds?id=`,
+  GET_STORE_COMPLETED_ORDERS_URL: `${SOCKET_BASE_URL}order/get-kds?id=`,
+  GET_ACCEPT_ORDERS_URL: `${SOCKET_BASE_URL}order/accept/`,
+
   STORE_START_DAY_URL: `${SOCKET_BASE_URL}store_end_day/profile/`,
   GET_VOID_ORDERS_URL: `${SOCKET_BASE_URL}order/complete-void-kds?id=`,
   UPDATE_ORDER_URL: `${SOCKET_BASE_URL}order/update-by-kds/`,

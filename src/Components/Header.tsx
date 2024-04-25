@@ -11,20 +11,28 @@ import {
   Fab,
   MenuItem,
   Select,
+  Button,
+  Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import CachedIcon from "@mui/icons-material/Cached";
 function Header() {
   const dispatch = useDispatch();
+  const totalOrders = useSelector((state: any) => state.orders.totalOrder);
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
-
+  console.log(totalOrders);
   return (
     <>
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={8} md={9} lg={10.5}>
+            <Grid item xs={12} sm={8} md={9} lg={2}>
               <img src="/logo/loop_logo.gif" alt="logo" width={160} />
+            </Grid>
+            <Grid item xs={12} sm={8} md={9} lg={8.5} textAlign={"center"}>
+              <Typography variant="h6" color="warning" fontFamily={"poppins"}>
+                Total Orders : {totalOrders}
+              </Typography>
             </Grid>
             <Grid
               item
