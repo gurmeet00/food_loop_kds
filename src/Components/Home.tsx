@@ -145,7 +145,6 @@ function Home() {
   //==========================================================================================
   // GET STORE DAY ID
   async function getStoreDay() {
-    console.log("store day");
     let response = await storeController.getStartDay({ _id: storeId });
     if (response.status == ApiStatus.STATUS_200) {
       if (
@@ -300,7 +299,6 @@ function Home() {
       // let found = OrderData.includes(
       //   (ele: Record<string, any>) => ele._id == data._id
       // );
-      // console.log(found);
       // if (!found) {
       //   OrderData.unshift(data);
       //   ghostOrders = OrderData;
@@ -315,11 +313,10 @@ function Home() {
   function updateOrder() {
     socket.on("updated_order", (data) => {
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
-      console.log(data, "update this");
       let found = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
-      console.log(found, "index");
+
       if (found) {
         if (data.is_completed || data.is_cancelled) {
           orderData.splice(found, 1);
@@ -381,8 +378,6 @@ function Home() {
   async function handleAcceptOrder(obj: Record<string, any>, index: number) {
     setNotifyLoading(true);
     setBtnIndex(index);
-    console.log(index);
-
     await storeController
       .accpetOrder({ _id: obj._id })
       .then((response: any) => {
@@ -398,7 +393,6 @@ function Home() {
 
   async function handleReadyToPick(obj: Record<string, any>, index: number) {
     setBtnIndex(index);
-    console.log(index);
     setReadyToPickLoading(true);
 
     await storeController
