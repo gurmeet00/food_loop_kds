@@ -9,18 +9,27 @@ import persistStore from "redux-persist/es/persistStore";
 import { PersistGate } from "redux-persist/integration/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useState } from "react";
 const persistor = persistStore(store);
 
 function App() {
   const queryClient = new QueryClient();
+  const [activeBtnName, setActiveBtnName] = useState("newOrder");
+
+  //THIS IS A CALL-BACK FUNCTION, USE TO GET ACTIVE BUTTUN VALUE FROM HOME PAGE, THAT BUTTON IS ON ALL, CANCEL AND COMPLETE.
+  // AND GET VALUE THEN PASS TO HEADER COMPONENT.
+  function activeBtnState(name) {
+    setActiveBtnName(name);
+  }
+
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Header />,
+      element: <Header activeBtnName={activeBtnName} />,
       children: [
         {
           path: "/",
-          element: <Home />,
+          element: <Home isActive={activeBtnState} />,
         },
         {
           path: "/storeclose",

@@ -31,7 +31,11 @@ import VisibilitySharpIcon from "@mui/icons-material/VisibilitySharp";
 import { textUpperCase } from "../helper/g_constants.ts";
 import ChairAltTwoToneIcon from "@mui/icons-material/ChairAltTwoTone";
 import { SocketController } from "./Controllers/socketController.tsx";
-import { setTotalOrder } from "./Redux_Store/Slices/OrderSlice.js";
+import {
+  setCancelOrder,
+  setCompleteOrder,
+  setTotalOrder,
+} from "./Redux_Store/Slices/OrderSlice.js";
 // import CachedIcon from "@mui/icons-material/Cached";
 // import {
 //   setAllOrder,
@@ -40,7 +44,7 @@ import { setTotalOrder } from "./Redux_Store/Slices/OrderSlice.js";
 const gToaster = new GToaster();
 const storeController = new StoreController();
 const socketController = new SocketController();
-function Home() {
+function Home({ isActive }) {
   const socket: Socket = io(
     `wss://loopbackendnew.loop.rockymountaintech.co?store=659e6700e0ec95ac62733139`,
     {
@@ -70,6 +74,7 @@ function Home() {
   const [completeOrders, setCompleteOrders] = useState([]);
   const [storeDate, setStoreDate] = useState("");
   const [storeTime, setStoreTime] = useState("");
+
   let ghostOrders: Array<Record<string, any>> = [];
 
   // const ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
@@ -86,7 +91,7 @@ function Home() {
   //==========================================================================================
   //ACTIVE NEW/OLD FUNCTION
 
-  function activeNewOldOrders(name: string) {
+  function activeNewCancelCompleteOrders(name: string) {
     if (name == "newOrder") {
       setNewOrdersBtn(true);
       setCancelOrdersBtn(false);
@@ -100,6 +105,7 @@ function Home() {
       setCancelOrdersBtn(false);
       setCompleteOrdersBtn(true);
     }
+    isActive(name);
   }
 
   //==========================================================================================
@@ -122,7 +128,6 @@ function Home() {
   //==========================================================================================
   // GET STORE PROFILE DATA
   async function getStoreProfile() {
-    setLoading(true);
     let response = await storeController.getStoreDetails({ _id: storeId });
     if (response.status == ApiStatus.STATUS_200) {
       dispatch(setStore(response.data.data));
@@ -155,11 +160,11 @@ function Home() {
         // socketController.connect(storeId, ordersSliceData);
         //IF WE GET STORE DAY ID, MEANS STORE IS OPEN THEN CONNECT SOCKET & PASS DAY_ID TO API USE TO GET ALL ORDER, VOID AND COMPLETED ORDERS.
 
+        connect();
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
         getStoreCompleteOrdersData(response.data.data?.day_id);
         getStoreVoidOrdersData(response.data.data?.day_id);
-        connect();
       } else {
         navigate("/storeclose");
       }
@@ -181,7 +186,6 @@ function Home() {
       day_id: startDayId,
       store_Id: storeId,
     });
-    setLoading(false);
 
     if (response.status == ApiStatus.STATUS_200) {
       dispatch(setTotalOrder(response.data.data.length));
@@ -213,17 +217,20 @@ function Home() {
 
       setOrders(response.data.data);
       ghostOrders = response.data.data;
+      setLoading(false);
+
       // dispatch(setAllOrder(response.data.data));
     } else if (response.status == ApiStatus.STATUS_500) {
       gToaster.warning({ title: "500 Server Error" });
+      setLoading(false);
     } else {
       gToaster.warning({ title: " Server Error" });
+      setLoading(false);
     }
   }
   //==========================================================================================
   // GET VOID ORDERS
   async function getStoreVoidOrdersData(startDayId) {
-    setLoading(true);
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
@@ -232,10 +239,10 @@ function Home() {
       day_id: startDayId,
       store_Id: storeId,
     });
-    setLoading(false);
 
     if (response.status == ApiStatus.STATUS_200) {
       setVoidOrders(response.data.data);
+      dispatch(setCancelOrder(response.data.data.length));
       // dispatch(setAllVoidOrder(response.data.data));
     } else if (response.status == ApiStatus.STATUS_500) {
       gToaster.warning({ title: "500 Server Error" });
@@ -247,7 +254,6 @@ function Home() {
   //==========================================================================================
   // GET COMPLETED ORDERS
   async function getStoreCompleteOrdersData(startDayId) {
-    setLoading(true);
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
@@ -256,9 +262,9 @@ function Home() {
       day_id: startDayId,
       store_Id: storeId,
     });
-    setLoading(false);
 
     if (response.status == ApiStatus.STATUS_200) {
+      dispatch(setCompleteOrder(response.data.data.length));
       setCompleteOrders(response.data.data);
       // dispatch(setAllVoidOrder(response.data.data));
     } else if (response.status == ApiStatus.STATUS_500) {
@@ -313,11 +319,11 @@ function Home() {
   function updateOrder() {
     socket.on("updated_order", (data) => {
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
-      let found = orderData.findIndex(
+      let found: number = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
       );
 
-      if (found) {
+      if (found || found == 0) {
         if (data.is_completed || data.is_cancelled) {
           orderData.splice(found, 1);
         } else {
@@ -326,7 +332,6 @@ function Home() {
 
         ghostOrders = orderData;
         setOrders(orderData);
-
         // dispatch(setAllOrder(orderData));
       }
     });
@@ -431,7 +436,7 @@ function Home() {
         <>
           <ButttonBar
             activeBtn={handleActive}
-            activeNewOldBtn={activeNewOldOrders}
+            activeNewOldBtn={activeNewCancelCompleteOrders}
             allBtn={all}
             diningBtn={dining}
             takeAwayBtn={takeAway}

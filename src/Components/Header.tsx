@@ -16,10 +16,35 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import CachedIcon from "@mui/icons-material/Cached";
-function Header() {
+function Header({ activeBtnName }) {
   const dispatch = useDispatch();
   const totalOrders = useSelector((state: any) => state.orders.totalOrder);
+  const cancelOrders = useSelector((state: any) => state.orders.cancelOrder);
+  const completeOrders = useSelector(
+    (state: any) => state.orders.completeOrder
+  );
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
+
+  const [newOrdersBtn, setNewOrdersBtn] = useState(true);
+  const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
+  const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
+
+  useEffect(() => {
+    if (activeBtnName == "newOrder") {
+      setNewOrdersBtn(true);
+      setCancelOrdersBtn(false);
+      setCompleteOrdersBtn(false);
+    } else if (activeBtnName == "cancelOrder") {
+      setNewOrdersBtn(false);
+      setCancelOrdersBtn(true);
+      setCompleteOrdersBtn(false);
+    } else if (activeBtnName == "completeOrder") {
+      setNewOrdersBtn(false);
+      setCancelOrdersBtn(false);
+      setCompleteOrdersBtn(true);
+    }
+  });
+
   return (
     <>
       <Card className="cardDesign">
@@ -30,7 +55,17 @@ function Header() {
             </Grid>
             <Grid item xs={12} sm={8} md={9} lg={8.5} textAlign={"center"}>
               <Typography variant="h6" color="warning" fontFamily={"poppins"}>
-                Total Orders : {totalOrders}
+                {cancelOrdersBtn
+                  ? "Cancel "
+                  : completeOrdersBtn
+                  ? " Complete "
+                  : "Total "}
+                Orders :{" "}
+                {cancelOrdersBtn
+                  ? cancelOrders
+                  : completeOrdersBtn
+                  ? completeOrders
+                  : totalOrders}
               </Typography>
             </Grid>
             <Grid

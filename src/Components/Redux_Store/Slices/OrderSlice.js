@@ -8,6 +8,8 @@ const OrderSlice = createSlice({
     updateOrder: null,
     gridNum: 4,
     totalOrder: 0,
+    cancelOrder: 0,
+    completeOrder: 0,
   },
   reducers: {
     setAllOrder(state, action) {
@@ -22,6 +24,12 @@ const OrderSlice = createSlice({
     setTotalOrder(state, action) {
       state.totalOrder = action.payload;
     },
+    setCancelOrder(state, action) {
+      state.cancelOrder = action.payload;
+    },
+    setCompleteOrder(state, action) {
+      state.completeOrder = action.payload;
+    },
     // updateSingleOrder(state, action) {
     //   console.log(action.payload);
     //   state.updateOrder = action.payload;
@@ -29,6 +37,12 @@ const OrderSlice = createSlice({
   },
 });
 
-export const { setAllOrder, setAllVoidOrder, setGridNum, setTotalOrder } =
-  OrderSlice.actions;
+export const {
+  setAllOrder,
+  setAllVoidOrder,
+  setGridNum,
+  setTotalOrder,
+  setCancelOrder,
+  setCompleteOrder,
+} = OrderSlice.actions;
 export default OrderSlice.reducer;
