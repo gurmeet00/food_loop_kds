@@ -36,6 +36,7 @@ import {
   setCompleteOrder,
   setTotalOrder,
 } from "./Redux_Store/Slices/OrderSlice.js";
+import Shimmer from "./Shimmer.tsx";
 // import CachedIcon from "@mui/icons-material/Cached";
 // import {
 //   setAllOrder,
@@ -65,7 +66,7 @@ function Home({ isActive }) {
   const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
   const [orders, setOrders] = useState([]);
   const [btnIndex, setBtnIndex] = useState<number>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [notifyloading, setNotifyLoading] = useState(false);
   const [readyToPickLoading, setReadyToPickLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -448,9 +449,10 @@ function Home({ isActive }) {
           <Grid container spacing={1} sx={{ my: 1, px: 2 }}>
             {loading ? (
               <>
-                <Grid item xs={12} sx={{ textAlign: "center", py: "50px" }}>
+                {/* <Grid item xs={12} sx={{ textAlign: "center", py: "50px" }}>
                   <CircularProgress color="warning" />
-                </Grid>
+                </Grid> */}
+                <Shimmer />
               </>
             ) : (
               <>
@@ -585,119 +587,115 @@ function Home({ isActive }) {
                                     : ele?.dine_in?.length > 0
                                     ? ele?.dine_in
                                     : []
-                                  )
-                                    // ? ele?.take_away
-                                    // : ele?.dine_in?.length > 0
-                                    // ? ele?.dine_in
-                                    // : []
-                                    .map(
-                                      (
-                                        foodItems: Record<string, any>,
-                                        foodItemsIndex: number
-                                      ) => (
-                                        <React.Fragment key={foodItemsIndex}>
-                                          <Grid item xs={12} md={1}>
-                                            <Typography
-                                              sx={{
-                                                paddingBottom: "0px",
-                                                mb: "0px",
-                                                pt: "8px",
-                                              }}
-                                            >
-                                              <b>{foodItems?.order_id}</b>
-                                            </Typography>
-                                          </Grid>
+                                  ).map(
+                                    (
+                                      foodItems: Record<string, any>,
+                                      foodItemsIndex: number
+                                    ) => (
+                                      <React.Fragment key={foodItemsIndex}>
+                                        <Grid item xs={12} md={1}>
+                                          <Typography
+                                            sx={{
+                                              paddingBottom: "0px",
+                                              mb: "0px",
+                                              pt: "8px",
+                                            }}
+                                          >
+                                            <b>{foodItems?.order_id}</b>
+                                          </Typography>
+                                        </Grid>
 
-                                          <Grid item xs={12} md={11}>
-                                            {foodItems?.product.map(
-                                              (
-                                                productItem: Record<
-                                                  string,
-                                                  any
-                                                >,
-                                                productIndex: number
-                                              ) => (
-                                                <React.Fragment
-                                                  key={productIndex}
+                                        <Grid item xs={12} md={11}>
+                                          {foodItems?.product.map(
+                                            (
+                                              productItem: Record<string, any>,
+                                              productIndex: number
+                                            ) => (
+                                              <React.Fragment
+                                                key={productIndex}
+                                              >
+                                                <Grid
+                                                  container
+                                                  spacing={1}
+                                                  className="cardItems"
                                                 >
                                                   <Grid
-                                                    container
-                                                    spacing={1}
-                                                    className="cardItems"
+                                                    item
+                                                    xs={12}
+                                                    display={"flex"}
+                                                    justifyContent={
+                                                      "space-between"
+                                                    }
+                                                    alignItems={"center"}
                                                   >
-                                                    <Grid
-                                                      item
-                                                      xs={12}
-                                                      display={"flex"}
-                                                      justifyContent={
-                                                        "space-between"
-                                                      }
-                                                      alignItems={"center"}
-                                                    >
-                                                      <Typography
-                                                        paragraph={true}
-                                                        sx={{
-                                                          marginBottom: "0px",
-                                                          textDecoration:
-                                                            productItem?.include
-                                                              ? "line-through"
-                                                              : "none",
-                                                        }}
-                                                      >
-                                                        {newOrdersBtn && (
-                                                          <Checkbox
-                                                            checked={
-                                                              productItem?.include
-                                                            }
-                                                            size="medium"
-                                                            color="warning"
-                                                            onChange={() =>
-                                                              handleCutItem(
-                                                                orderIndex,
-                                                                foodItemsIndex,
-                                                                productIndex,
-                                                                !productItem?.include,
-                                                                ele?.order_type,
-                                                                ele?._id
-                                                              )
-                                                            }
-                                                          />
-                                                        )}
-                                                        <b>
-                                                          {productItem?.quantity +
-                                                            " x " +
-                                                            productItem?.product
-                                                              ?.name}
-                                                        </b>
-                                                      </Typography>
-                                                      {productItem?.include && (
-                                                        <Chip
-                                                          label="Done"
-                                                          color="success"
-                                                          variant="outlined"
-                                                          size="small"
-                                                          sx={{
-                                                            float: "right",
-                                                          }}
-                                                        />
-                                                      )}
-                                                    </Grid>
-                                                    <Grid
-                                                      item
-                                                      xs={12}
-                                                      style={{
-                                                        fontSize: "14px",
-                                                        color: "#595454",
-                                                        paddingLeft: "20px",
+                                                    <Typography
+                                                      paragraph={true}
+                                                      sx={{
+                                                        marginBottom: "0px",
+                                                        textDecoration:
+                                                          productItem?.include
+                                                            ? "line-through"
+                                                            : "none",
+                                                        marginTop:
+                                                          completeOrdersBtn
+                                                            ? "8px"
+                                                            : "0px",
                                                       }}
                                                     >
-                                                      {productItem?.selected_pizza_variants !=
-                                                        null && (
-                                                        <Grid
-                                                          container
-                                                          spacing={0}
-                                                        >
-                                                          {/* <Grid item xs={12}>
+                                                      {newOrdersBtn && (
+                                                        <Checkbox
+                                                          checked={
+                                                            productItem?.include
+                                                          }
+                                                          size="medium"
+                                                          color="warning"
+                                                          onChange={() =>
+                                                            handleCutItem(
+                                                              orderIndex,
+                                                              foodItemsIndex,
+                                                              productIndex,
+                                                              !productItem?.include,
+                                                              ele?.order_type,
+                                                              ele?._id
+                                                            )
+                                                          }
+                                                        />
+                                                      )}
+                                                      <b>
+                                                        {productItem?.quantity +
+                                                          " x " +
+                                                          productItem?.product
+                                                            ?.name}
+                                                      </b>
+                                                    </Typography>
+                                                    {productItem?.include && (
+                                                      <Chip
+                                                        label="Done"
+                                                        color="success"
+                                                        variant="outlined"
+                                                        size="small"
+                                                        sx={{
+                                                          float: "right",
+                                                        }}
+                                                      />
+                                                    )}
+                                                  </Grid>
+                                                  <Grid
+                                                    item
+                                                    xs={12}
+                                                    style={{
+                                                      fontSize: "14px",
+                                                      color: "#595454",
+                                                      paddingLeft: "20px",
+                                                    }}
+                                                  >
+                                                    {productItem?.selected_pizza_variants !=
+                                                      null && (
+                                                      <Grid
+                                                        container
+                                                        spacing={0}
+                                                      >
+                                                        {/* <Grid item xs={12}>
                                                             <span className="primaryColor">
                                                               <b> Category</b>
                                                             </span>
@@ -709,250 +707,236 @@ function Home({ isActive }) {
                                                             />
                                                           </Grid> */}
 
-                                                          <Grid item xs={12}>
-                                                            <span className="selectedPizzaVariants">
-                                                              <b>Size : </b>
-                                                              {`${productItem?.selected_pizza_variants.size?.size?.name}`}
-                                                            </span>
-                                                            <Divider
-                                                              sx={{ my: 1 }}
-                                                            />
-                                                          </Grid>
-                                                          {/* {SELECTED VARIANT PIZZA} */}
-
-                                                          <Grid item xs={12}>
-                                                            <span className="selectedPizzaVariants">
-                                                              {productItem?.selected_pizza_variants.size?.data?.sauces?.map(
-                                                                (
-                                                                  sauceItem: Record<
-                                                                    string,
-                                                                    any
-                                                                  >,
-                                                                  sauceIndex: number
-                                                                ) => (
-                                                                  <React.Fragment
-                                                                    key={
-                                                                      sauceIndex
-                                                                    }
-                                                                  >
-                                                                    <b>
-                                                                      {`${sauceItem.sauce_category.category_name} : `}
-                                                                    </b>
-                                                                    {sauceItem.data?.sauce_items?.map(
-                                                                      (
-                                                                        sItem: Record<
-                                                                          string,
-                                                                          any
-                                                                        >
-                                                                      ) =>
-                                                                        sItem
-                                                                          ?.sauce_item_data
-                                                                          ?.name
-                                                                    )}
-                                                                  </React.Fragment>
-                                                                )
-                                                              )}
-                                                            </span>
-                                                            <Divider
-                                                              sx={{ my: 1 }}
-                                                            />
-                                                          </Grid>
-
-                                                          <Grid item xs={12}>
-                                                            {productItem?.selected_pizza_variants.size?.data?.topping?.map(
-                                                              (
-                                                                toppingItem: Record<
-                                                                  string,
-                                                                  any
-                                                                >,
-                                                                toppingIndex: number
-                                                              ) => (
-                                                                <React.Fragment
-                                                                  key={
-                                                                    toppingIndex
-                                                                  }
-                                                                >
-                                                                  <span
-                                                                    style={{
-                                                                      width:
-                                                                        "100%",
-                                                                    }}
-                                                                  >
-                                                                    <b>
-                                                                      {`${toppingItem.topping_category.category_name} : `}
-                                                                    </b>
-                                                                    {toppingItem.data?.toppings_items?.map(
-                                                                      (
-                                                                        toppItem: Record<
-                                                                          string,
-                                                                          any
-                                                                        >
-                                                                      ) =>
-                                                                        " " +
-                                                                        toppItem
-                                                                          ?.topping_item_data
-                                                                          ?.name +
-                                                                        ","
-                                                                    )}
-                                                                  </span>
-                                                                  <br />
-                                                                </React.Fragment>
-                                                              )
-                                                            )}
-
-                                                            <Divider
-                                                              sx={{ my: 1 }}
-                                                            />
-                                                          </Grid>
-
-                                                          <Grid item xs={12}>
-                                                            <span className="selectedPizzaVariants">
-                                                              <b>{`
-                                                              ${productItem?.selected_pizza_variants.size?.data?.crust?.crust_data.name} : `}</b>
-                                                            </span>
-                                                            <span>
-                                                              {
-                                                                productItem
-                                                                  ?.selected_pizza_variants
-                                                                  .size?.data
-                                                                  ?.crust?.data
-                                                                  .crust_name
-                                                              }
-                                                            </span>
-                                                            <Divider
-                                                              sx={{ my: 1 }}
-                                                            />
-                                                          </Grid>
-
-                                                          <Grid item xs={12}>
-                                                            {productItem?.selected_pizza_variants.size?.data?.cheese?.map(
-                                                              (
-                                                                cheeseItem: Record<
-                                                                  string,
-                                                                  any
-                                                                >,
-                                                                cheeseIndex: number
-                                                              ) => (
-                                                                <React.Fragment
-                                                                  key={
-                                                                    cheeseIndex
-                                                                  }
-                                                                >
-                                                                  <span
-                                                                    style={{
-                                                                      width:
-                                                                        "100%",
-                                                                    }}
-                                                                  >
-                                                                    <b>
-                                                                      {`${cheeseItem.cheese_category.category_name} : `}
-                                                                    </b>
-                                                                    {cheeseItem.data?.cheese_items?.map(
-                                                                      (
-                                                                        cheeItem: Record<
-                                                                          string,
-                                                                          any
-                                                                        >
-                                                                      ) =>
-                                                                        " " +
-                                                                        cheeItem
-                                                                          ?.cheese_item_data
-                                                                          ?.name +
-                                                                        ","
-                                                                    )}
-                                                                  </span>
-                                                                  <br />
-                                                                </React.Fragment>
-                                                              )
-                                                            )}
-                                                          </Grid>
+                                                        <Grid item xs={12}>
+                                                          <span className="selectedPizzaVariants">
+                                                            <b>Size : </b>
+                                                            {`${productItem?.selected_pizza_variants.size?.size?.name}`}
+                                                          </span>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
                                                         </Grid>
-                                                      )}
-                                                      {/* //SELECTED VARIANT */}
-                                                      {productItem?.selected_variants?.map(
-                                                        (
-                                                          selectedVar: Record<
-                                                            string,
-                                                            any
-                                                          >,
-                                                          indexSelectedVar: number
-                                                        ) => (
-                                                          <React.Fragment
-                                                            key={
-                                                              indexSelectedVar
-                                                            }
-                                                          >
-                                                            <Grid
-                                                              container
-                                                              spacing={1}
-                                                            >
-                                                              <Grid
-                                                                item
-                                                                xs={12}
-                                                              >
-                                                                <Typography
-                                                                  marginBottom={
-                                                                    0
+                                                        {/* {SELECTED VARIANT PIZZA} */}
+
+                                                        <Grid item xs={12}>
+                                                          <span className="selectedPizzaVariants">
+                                                            {productItem?.selected_pizza_variants.size?.data?.sauces?.map(
+                                                              (
+                                                                sauceItem: Record<
+                                                                  string,
+                                                                  any
+                                                                >,
+                                                                sauceIndex: number
+                                                              ) => (
+                                                                <React.Fragment
+                                                                  key={
+                                                                    sauceIndex
                                                                   }
                                                                 >
                                                                   <b>
-                                                                    {
-                                                                      selectedVar
-                                                                        ?.variant_category
-                                                                        ?.name
-                                                                    }
+                                                                    {`${sauceItem.sauce_category.category_name} : `}
                                                                   </b>
-                                                                </Typography>
-                                                              </Grid>
-                                                              <Grid
-                                                                item
-                                                                xs={12}
-                                                              >
-                                                                <Typography
-                                                                  marginRight={
-                                                                    5
-                                                                  }
-                                                                  mt={"-5px"}
-                                                                  paragraph={
-                                                                    true
-                                                                  }
-                                                                >
-                                                                  {selectedVar?.data?.items.map(
+                                                                  {sauceItem.data?.sauce_items?.map(
                                                                     (
-                                                                      item: Record<
-                                                                        any,
+                                                                      sItem: Record<
+                                                                        string,
                                                                         any
-                                                                      >,
-                                                                      itemIndex: number
-                                                                    ) => (
-                                                                      <React.Fragment
-                                                                        key={
-                                                                          itemIndex
-                                                                        }
                                                                       >
-                                                                        {" " +
-                                                                          item
-                                                                            ?.item_data
-                                                                            ?.variant_name}
-                                                                        ,
-                                                                      </React.Fragment>
-                                                                    )
+                                                                    ) =>
+                                                                      sItem
+                                                                        ?.sauce_item_data
+                                                                        ?.name
                                                                   )}
-                                                                </Typography>
-                                                              </Grid>
+                                                                </React.Fragment>
+                                                              )
+                                                            )}
+                                                          </span>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                        </Grid>
+
+                                                        <Grid item xs={12}>
+                                                          {productItem?.selected_pizza_variants.size?.data?.topping?.map(
+                                                            (
+                                                              toppingItem: Record<
+                                                                string,
+                                                                any
+                                                              >,
+                                                              toppingIndex: number
+                                                            ) => (
+                                                              <React.Fragment
+                                                                key={
+                                                                  toppingIndex
+                                                                }
+                                                              >
+                                                                <span
+                                                                  style={{
+                                                                    width:
+                                                                      "100%",
+                                                                  }}
+                                                                >
+                                                                  <b>
+                                                                    {`${toppingItem.topping_category.category_name} : `}
+                                                                  </b>
+                                                                  {toppingItem.data?.toppings_items?.map(
+                                                                    (
+                                                                      toppItem: Record<
+                                                                        string,
+                                                                        any
+                                                                      >
+                                                                    ) =>
+                                                                      " " +
+                                                                      toppItem
+                                                                        ?.topping_item_data
+                                                                        ?.name +
+                                                                      ","
+                                                                  )}
+                                                                </span>
+                                                                <br />
+                                                              </React.Fragment>
+                                                            )
+                                                          )}
+
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                        </Grid>
+
+                                                        <Grid item xs={12}>
+                                                          <span className="selectedPizzaVariants">
+                                                            <b>{`
+                                                              ${productItem?.selected_pizza_variants.size?.data?.crust?.crust_data.name} : `}</b>
+                                                          </span>
+                                                          <span>
+                                                            {
+                                                              productItem
+                                                                ?.selected_pizza_variants
+                                                                .size?.data
+                                                                ?.crust?.data
+                                                                .crust_name
+                                                            }
+                                                          </span>
+                                                          <Divider
+                                                            sx={{ my: 1 }}
+                                                          />
+                                                        </Grid>
+
+                                                        <Grid item xs={12}>
+                                                          {productItem?.selected_pizza_variants.size?.data?.cheese?.map(
+                                                            (
+                                                              cheeseItem: Record<
+                                                                string,
+                                                                any
+                                                              >,
+                                                              cheeseIndex: number
+                                                            ) => (
+                                                              <React.Fragment
+                                                                key={
+                                                                  cheeseIndex
+                                                                }
+                                                              >
+                                                                <span
+                                                                  style={{
+                                                                    width:
+                                                                      "100%",
+                                                                  }}
+                                                                >
+                                                                  <b>
+                                                                    {`${cheeseItem.cheese_category.category_name} : `}
+                                                                  </b>
+                                                                  {cheeseItem.data?.cheese_items?.map(
+                                                                    (
+                                                                      cheeItem: Record<
+                                                                        string,
+                                                                        any
+                                                                      >
+                                                                    ) =>
+                                                                      " " +
+                                                                      cheeItem
+                                                                        ?.cheese_item_data
+                                                                        ?.name +
+                                                                      ","
+                                                                  )}
+                                                                </span>
+                                                                <br />
+                                                              </React.Fragment>
+                                                            )
+                                                          )}
+                                                        </Grid>
+                                                      </Grid>
+                                                    )}
+                                                    {/* //SELECTED VARIANT */}
+                                                    {productItem?.selected_variants?.map(
+                                                      (
+                                                        selectedVar: Record<
+                                                          string,
+                                                          any
+                                                        >,
+                                                        indexSelectedVar: number
+                                                      ) => (
+                                                        <React.Fragment
+                                                          key={indexSelectedVar}
+                                                        >
+                                                          <Grid
+                                                            container
+                                                            spacing={1}
+                                                          >
+                                                            <Grid item xs={12}>
+                                                              <Typography
+                                                                marginBottom={0}
+                                                              >
+                                                                <b>
+                                                                  {
+                                                                    selectedVar
+                                                                      ?.variant_category
+                                                                      ?.name
+                                                                  }
+                                                                </b>
+                                                              </Typography>
                                                             </Grid>
-                                                          </React.Fragment>
-                                                        )
-                                                      )}
-                                                    </Grid>
+                                                            <Grid item xs={12}>
+                                                              <Typography
+                                                                marginRight={5}
+                                                                mt={"-5px"}
+                                                                paragraph={true}
+                                                              >
+                                                                {selectedVar?.data?.items.map(
+                                                                  (
+                                                                    item: Record<
+                                                                      any,
+                                                                      any
+                                                                    >,
+                                                                    itemIndex: number
+                                                                  ) => (
+                                                                    <React.Fragment
+                                                                      key={
+                                                                        itemIndex
+                                                                      }
+                                                                    >
+                                                                      {" " +
+                                                                        item
+                                                                          ?.item_data
+                                                                          ?.variant_name}
+                                                                      ,
+                                                                    </React.Fragment>
+                                                                  )
+                                                                )}
+                                                              </Typography>
+                                                            </Grid>
+                                                          </Grid>
+                                                        </React.Fragment>
+                                                      )
+                                                    )}
                                                   </Grid>
-                                                </React.Fragment>
-                                              )
-                                            )}
-                                          </Grid>
-                                        </React.Fragment>
-                                      )
-                                    )}
+                                                </Grid>
+                                              </React.Fragment>
+                                            )
+                                          )}
+                                        </Grid>
+                                      </React.Fragment>
+                                    )
+                                  )}
                                 </Grid>
                               </Grid>
                               {newOrdersBtn && (
