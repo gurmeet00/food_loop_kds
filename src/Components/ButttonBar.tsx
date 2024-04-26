@@ -16,7 +16,7 @@ function ButttonBar({
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={3.5} md={2.5} lg={2} xl={1.5}>
+            <Grid item xs={12} sm={3.5} md={2.7} lg={2} xl={1.6}>
               <Button
                 variant={newOrdersBtn ? "contained" : "outlined"}
                 size="small"
@@ -26,7 +26,7 @@ function ButttonBar({
                 New/Upcoming Orders
               </Button>
             </Grid>
-            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={1.3}>
+            <Grid item xs={12} sm={3.5} md={2.6} lg={2} xl={1.5}>
               <Button
                 variant={cancelOrdersBtn ? "contained" : "outlined"}
                 // className="customBtn"
@@ -37,7 +37,7 @@ function ButttonBar({
                 Cancel/Void Orders
               </Button>
             </Grid>
-            <Grid item xs={12} sm={3.5} md={6} lg={7} xl={7.3}>
+            <Grid item xs={12} sm={3.5} md={3} lg={5} xl={6}>
               <Button
                 variant={completeOrdersBtn ? "contained" : "outlined"}
                 // className="customBtn"
@@ -54,7 +54,7 @@ function ButttonBar({
               sm={1.5}
               md={1}
               lg={1}
-              xl={0.5}
+              xl={0.8}
               sx={{ textAlign: { xs: "center" } }}
             >
               <Button
@@ -73,7 +73,7 @@ function ButttonBar({
               sm={1.5}
               md={1}
               lg={1}
-              xl={0.5}
+              xl={0.8}
               sx={{ textAlign: { xs: "center" } }}
             >
               <Button
@@ -92,7 +92,7 @@ function ButttonBar({
               sm={2}
               md={1.5}
               lg={1}
-              xl={0.8}
+              xl={1}
               sx={{ textAlign: { xs: "center" } }}
             >
               <Button
