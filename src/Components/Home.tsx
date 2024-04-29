@@ -446,17 +446,28 @@ function Home({ isActive }) {
             completeOrdersBtn={completeOrdersBtn}
           />
 
-          <Grid container spacing={1} sx={{ my: 1, px: 2 }}>
-            {loading ? (
-              <>
-                {/* <Grid item xs={12} sx={{ textAlign: "center", py: "50px" }}>
-                  <CircularProgress color="warning" />
-                </Grid> */}
+          {loading ? (
+            <>
+              <Grid container spacing={1} sx={{ my: 1, px: 2 }}>
                 <Shimmer />
-              </>
-            ) : (
-              <>
-                <Masonry gutter="5px" columnsCount={GridNumber}>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <ResponsiveMasonry
+                columnsCountBreakPoints={{
+                  450: 1,
+                  750: GridNumber,
+                  900: GridNumber,
+                  1920: GridNumber,
+                  2480: GridNumber,
+                }}
+              >
+                <Masonry
+                  gutter="5px"
+                  className="masonaryGrid"
+                  // columnsCount={GridNumber}
+                >
                   {(newOrdersBtn
                     ? orders
                     : cancelOrdersBtn
@@ -1021,9 +1032,9 @@ function Home({ isActive }) {
                     );
                   })}
                 </Masonry>
-              </>
-            )}
-          </Grid>
+              </ResponsiveMasonry>
+            </>
+          )}
         </>
       )}
     </>

@@ -50,10 +50,10 @@ function Header({ activeBtnName }) {
       <Card className="cardDesign">
         <CardContent style={{ paddingBottom: "15px" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={8} md={3} lg={2}>
+            <Grid item xs={6} sm={8} md={3} lg={2}>
               <img src="/logo/loop_logo.gif" alt="logo" width={160} />
             </Grid>
-            <Grid item xs={12} sm={8} md={6} lg={8.5} textAlign={"center"}>
+            <Grid item xs={6} sm={8} md={6} lg={8.5} textAlign={"center"}>
               <Typography variant="h6" color="warning" fontFamily={"poppins"}>
                 {cancelOrdersBtn
                   ? "Cancel "
