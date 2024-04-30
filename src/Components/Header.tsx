@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import CachedIcon from "@mui/icons-material/Cached";
+import { setReloadCounter } from "./Redux_Store/Slices/StoreSlice";
 function Header({ activeBtnName }) {
   const dispatch = useDispatch();
   const totalOrders = useSelector((state: any) => state.orders.totalOrder);
@@ -28,6 +29,10 @@ function Header({ activeBtnName }) {
   const [newOrdersBtn, setNewOrdersBtn] = useState(true);
   const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
   const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
+
+  function handleCounter() {
+    dispatch(setReloadCounter(1));
+  }
 
   useEffect(() => {
     if (activeBtnName == "newOrder") {
@@ -76,7 +81,7 @@ function Header({ activeBtnName }) {
               lg={0.5}
               sx={{ textAlign: { xs: "left", md: "center" } }}
             >
-              <Fab color="warning" size="small">
+              <Fab color="warning" size="small" onClick={handleCounter}>
                 <CachedIcon sx={{ fontSize: "20px" }} />
               </Fab>
             </Grid>

@@ -23,6 +23,7 @@ import { StoreController } from "./Controllers/store_controller.tsx";
 import TableBarTwoToneIcon from "@mui/icons-material/TableBarTwoTone";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import {
+  setReloadCounter,
   setStore,
   setStoreDayDetails,
 } from "./Redux_Store/Slices/StoreSlice.js";
@@ -56,6 +57,8 @@ function Home({ isActive }) {
   let dispatch = useDispatch();
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
+  const counter = useSelector((state: any) => state.store.reloadCounter);
+  console.log(counter, "counter");
   const [searchParams, setSearchParams] = useSearchParams();
   const storeId = searchParams.get("id");
   const [all, setAll] = useState(true);
@@ -73,6 +76,7 @@ function Home({ isActive }) {
   const [connection, setConnection] = useState(false);
   const [voidOrders, setVoidOrders] = useState([]);
   const [completeOrders, setCompleteOrders] = useState([]);
+  const [dayId, setDayId] = useState([]);
   const [storeDate, setStoreDate] = useState("");
   const [storeTime, setStoreTime] = useState("");
 
@@ -162,6 +166,7 @@ function Home({ isActive }) {
         //IF WE GET STORE DAY ID, MEANS STORE IS OPEN THEN CONNECT SOCKET & PASS DAY_ID TO API USE TO GET ALL ORDER, VOID AND COMPLETED ORDERS.
 
         connect();
+        setDayId(response.data.data?.day_id);
         dispatch(setStoreDayDetails(response.data.data));
         getStoreOrdersData(response.data.data?.day_id);
         getStoreCompleteOrdersData(response.data.data?.day_id);
@@ -182,7 +187,7 @@ function Home({ isActive }) {
     // if (ordersSliceData?.length > 0) {
     //   setOrders(ordersSliceData);
     // }
-
+    console.log("GET ORDERS");
     let response = await storeController.getStoreOrders({
       day_id: startDayId,
       store_Id: storeId,
@@ -235,6 +240,7 @@ function Home({ isActive }) {
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
+    console.log("CANCEL ORDERS");
 
     let response = await storeController.getStoreVoidOrders({
       day_id: startDayId,
@@ -258,6 +264,7 @@ function Home({ isActive }) {
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
+    console.log("COMPLETE ORDERS");
 
     let response = await storeController.getStoreCompletedOrders({
       day_id: startDayId,
@@ -415,6 +422,13 @@ function Home({ isActive }) {
       });
   }
 
+  //THIS USE EFFECT FOR WHEN CLICK ON RELOAD BUTTIN "COUNTER" FROM STATE
+  useEffect(() => {
+    getStoreOrdersData(dayId);
+    getStoreVoidOrdersData(dayId);
+    getStoreCompleteOrdersData(dayId);
+  }, [counter]);
+
   useEffect(() => {
     if (storeId != null || storeId != undefined || storeId != "") {
       getStoreDay();
@@ -476,6 +490,12 @@ function Home({ isActive }) {
                     ? completeOrders
                     : []
                   )?.map((ele: Record<string, any>, orderIndex: number) => {
+                    let foundStatus = ele.track_order.find(
+                      (orderStatus: Record<string, any>) =>
+                        orderStatus.status == "ready_to_pick_up" ||
+                        (orderStatus.status == "completed" && orderStatus)
+                    );
+
                     return (
                       <React.Fragment key={orderIndex}>
                         {ele?.order_type
@@ -952,77 +972,80 @@ function Home({ isActive }) {
                               </Grid>
                               {newOrdersBtn && (
                                 <>
-                                  <Grid container spacing={1}>
-                                    {ele.is_new ? (
-                                      <Grid item xs={12} textAlign={"center"}>
-                                        {btnIndex == orderIndex &&
-                                        notifyloading ? (
-                                          <CircularProgress color="warning" />
-                                        ) : (
-                                          <>
-                                            <Button
-                                              disabled={
-                                                ele.track_order[
-                                                  ele.track_order.length - 1
-                                                ]?.status ==
-                                                  "ready_to_pick_up" ||
-                                                ele.is_new == false
-                                                  ? true
-                                                  : false
-                                              }
-                                              variant="contained"
-                                              // className="customBtn"
-                                              size="large"
-                                              color="error"
-                                              fullWidth
-                                              onClick={() =>
-                                                handleAcceptOrder(
-                                                  ele,
-                                                  orderIndex
-                                                )
-                                              }
-                                            >
-                                              <VisibilitySharpIcon /> &nbsp;
-                                              <b> Order Notifed</b>
-                                            </Button>
-                                          </>
-                                        )}
-                                      </Grid>
-                                    ) : (
-                                      <Grid item xs={12} textAlign={"center"}>
-                                        {btnIndex == orderIndex &&
-                                        readyToPickLoading ? (
-                                          <CircularProgress color="warning" />
-                                        ) : (
-                                          <>
-                                            <Button
-                                              disabled={
-                                                ele.track_order[
-                                                  ele.track_order.length - 1
-                                                ]?.status == "ready_to_pick_up"
-                                                  ? true
-                                                  : false
-                                              }
-                                              variant="contained"
-                                              // className="customBtn"
-                                              size="large"
-                                              color="warning"
-                                              fullWidth
-                                              onClick={() =>
-                                                handleReadyToPick(
-                                                  ele,
-                                                  orderIndex
-                                                )
-                                              }
-                                            >
-                                              <AlarmOnSharpIcon /> &nbsp;
-                                              <b> Ready to pick</b>
-                                            </Button>
-                                          </>
-                                        )}
-                                      </Grid>
-                                    )}
-                                  </Grid>
+                                  {!foundStatus && (
+                                    <Grid container spacing={1}>
+                                      {ele.is_new ? (
+                                        <Grid item xs={12} textAlign={"center"}>
+                                          {btnIndex == orderIndex &&
+                                          notifyloading ? (
+                                            <CircularProgress color="warning" />
+                                          ) : (
+                                            <>
+                                              <Button
+                                                disabled={
+                                                  ele.track_order[
+                                                    ele.track_order.length - 1
+                                                  ]?.status ==
+                                                    "ready_to_pick_up" ||
+                                                  ele.is_new == false
+                                                    ? true
+                                                    : false
+                                                }
+                                                variant="contained"
+                                                // className="customBtn"
+                                                size="large"
+                                                color="error"
+                                                fullWidth
+                                                onClick={() =>
+                                                  handleAcceptOrder(
+                                                    ele,
+                                                    orderIndex
+                                                  )
+                                                }
+                                              >
+                                                <VisibilitySharpIcon /> &nbsp;
+                                                <b> Order Notifed</b>
+                                              </Button>
+                                            </>
+                                          )}
+                                        </Grid>
+                                      ) : (
+                                        <Grid item xs={12} textAlign={"center"}>
+                                          {btnIndex == orderIndex &&
+                                          readyToPickLoading ? (
+                                            <CircularProgress color="warning" />
+                                          ) : (
+                                            <>
+                                              <Button
+                                                disabled={
+                                                  ele.track_order[
+                                                    ele.track_order.length - 1
+                                                  ]?.status ==
+                                                  "ready_to_pick_up"
+                                                    ? true
+                                                    : false
+                                                }
+                                                variant="contained"
+                                                // className="customBtn"
+                                                size="large"
+                                                color="warning"
+                                                fullWidth
+                                                onClick={() =>
+                                                  handleReadyToPick(
+                                                    ele,
+                                                    orderIndex
+                                                  )
+                                                }
+                                              >
+                                                <AlarmOnSharpIcon /> &nbsp;
+                                                <b> Ready to pick</b>
+                                              </Button>
+                                            </>
+                                          )}
+                                        </Grid>
+                                      )}
+                                    </Grid>
+                                  )}
                                 </>
                               )}
                             </CardContent>

@@ -5,6 +5,7 @@ const StoreSlice = createSlice({
   initialState: {
     storeDetail: null,
     storeDayDetail: null,
+    reloadCounter: 0,
   },
   reducers: {
     setStore(state, action) {
@@ -13,8 +14,16 @@ const StoreSlice = createSlice({
     setStoreDayDetails(state, action) {
       state.storeDayDetail = action.payload;
     },
+    setReloadCounter(state, action) {
+      if (state.reloadCounter > 4) {
+        state.reloadCounter = 0;
+      } else {
+        state.reloadCounter = state.reloadCounter + action.payload;
+      }
+    },
   },
 });
 
-export const { setStore, setStoreDayDetails } = StoreSlice.actions;
+export const { setStore, setStoreDayDetails, setReloadCounter } =
+  StoreSlice.actions;
 export default StoreSlice.reducer;
