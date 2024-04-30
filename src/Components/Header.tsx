@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 import { setAllOrder, setGridNum } from "./Redux_Store/Slices/OrderSlice";
 import {
   Card,
@@ -25,7 +25,7 @@ function Header({ activeBtnName }) {
     (state: any) => state.orders.completeOrder
   );
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
-
+  const [storeParam, setSeachParam] = useSearchParams();
   const [newOrdersBtn, setNewOrdersBtn] = useState(true);
   const [cancelOrdersBtn, setCancelOrdersBtn] = useState(false);
   const [completeOrdersBtn, setCompleteOrdersBtn] = useState(false);
@@ -59,19 +59,21 @@ function Header({ activeBtnName }) {
               <img src="/logo/loop_logo.gif" alt="logo" width={160} />
             </Grid>
             <Grid item xs={6} sm={8} md={6} lg={8.5} textAlign={"center"}>
-              <Typography variant="h6" color="warning" fontFamily={"poppins"}>
-                {cancelOrdersBtn
-                  ? "Cancel "
-                  : completeOrdersBtn
-                  ? " Complete "
-                  : "Total "}
-                Orders :{" "}
-                {cancelOrdersBtn
-                  ? cancelOrders
-                  : completeOrdersBtn
-                  ? completeOrders
-                  : totalOrders}
-              </Typography>
+              {storeParam.get("id") && (
+                <Typography variant="h6" color="warning" fontFamily={"poppins"}>
+                  {cancelOrdersBtn
+                    ? "Cancel "
+                    : completeOrdersBtn
+                    ? " Complete "
+                    : "Total "}
+                  Orders :{" "}
+                  {cancelOrdersBtn
+                    ? cancelOrders
+                    : completeOrdersBtn
+                    ? completeOrders
+                    : totalOrders}
+                </Typography>
+              )}
             </Grid>
             <Grid
               item

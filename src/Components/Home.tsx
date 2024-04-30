@@ -54,6 +54,7 @@ function Home({ isActive }) {
       autoConnect: true,
     }
   );
+
   let dispatch = useDispatch();
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
@@ -155,14 +156,9 @@ function Home({ isActive }) {
   async function getStoreDay() {
     let response = await storeController.getStartDay({ _id: storeId });
     if (response.status == ApiStatus.STATUS_200) {
-      if (
-        response.data.data?.day_id != null ||
-        response.data.data?.day_id != undefined ||
-        response.data.data?.day_id != false
-      ) {
+      if (response.data.data?.day_id) {
         // socketController.connect(storeId, ordersSliceData);
         //IF WE GET STORE DAY ID, MEANS STORE IS OPEN THEN CONNECT SOCKET & PASS DAY_ID TO API USE TO GET ALL ORDER, VOID AND COMPLETED ORDERS.
-
         connect();
         setDayId(response.data.data?.day_id);
         dispatch(setStoreDayDetails(response.data.data));
@@ -426,7 +422,7 @@ function Home({ isActive }) {
   }, [counter]);
 
   useEffect(() => {
-    if (storeId != null || storeId != undefined || storeId != "") {
+    if (storeId) {
       getStoreDay();
       getStoreProfile();
     } else {
