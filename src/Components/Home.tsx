@@ -58,7 +58,6 @@ function Home({ isActive }) {
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
   const counter = useSelector((state: any) => state.store.reloadCounter);
-  console.log(counter, "counter");
   const [searchParams, setSearchParams] = useSearchParams();
   const storeId = searchParams.get("id");
   const [all, setAll] = useState(true);
@@ -79,7 +78,6 @@ function Home({ isActive }) {
   const [dayId, setDayId] = useState([]);
   const [storeDate, setStoreDate] = useState("");
   const [storeTime, setStoreTime] = useState("");
-
   let ghostOrders: Array<Record<string, any>> = [];
 
   // const ordersSliceData = useSelector((state: any) => state.orders?.allOrder);
@@ -187,7 +185,7 @@ function Home({ isActive }) {
     // if (ordersSliceData?.length > 0) {
     //   setOrders(ordersSliceData);
     // }
-    console.log("GET ORDERS");
+
     let response = await storeController.getStoreOrders({
       day_id: startDayId,
       store_Id: storeId,
@@ -240,7 +238,6 @@ function Home({ isActive }) {
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
-    console.log("CANCEL ORDERS");
 
     let response = await storeController.getStoreVoidOrders({
       day_id: startDayId,
@@ -264,7 +261,6 @@ function Home({ isActive }) {
     // if (VoidOrdersSliceData?.length > 0) {
     //   setVoidOrders(VoidOrdersSliceData);
     // }
-    console.log("COMPLETE ORDERS");
 
     let response = await storeController.getStoreCompletedOrders({
       day_id: startDayId,
