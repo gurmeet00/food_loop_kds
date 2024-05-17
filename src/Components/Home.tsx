@@ -318,7 +318,7 @@ function Home({ isActive }) {
   // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
     socket.on("updated_order", (data) => {
-      console.log(data, "data");
+      // console.log(data, "data");
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
       let found: number = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
@@ -436,7 +436,7 @@ function Home({ isActive }) {
     };
   }, []);
 
-  console.log(orders, "<<<<<");
+  // console.log(orders, "<<<<<");
 
   return (
     <>
