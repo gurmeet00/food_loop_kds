@@ -38,6 +38,10 @@ import {
   setTotalOrder,
 } from "./Redux_Store/Slices/OrderSlice.js";
 import Shimmer from "./Shimmer.tsx";
+import {
+  getProductItems,
+  setNotifyOrders,
+} from "./Redux_Store/Slices/OrderNotify.js";
 // import CachedIcon from "@mui/icons-material/Cached";
 // import {
 //   setAllOrder,
@@ -59,6 +63,9 @@ function Home({ isActive }) {
   const navigate = useNavigate();
   const GridNumber = useSelector((state: any) => state.orders?.gridNum);
   const counter = useSelector((state: any) => state.store.reloadCounter);
+  const notifiedOrder = useSelector(
+    (state: any) => state.notifyOrders.notifyProductOrders
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const storeId = searchParams.get("id");
   const [all, setAll] = useState(true);
@@ -352,6 +359,8 @@ function Home({ isActive }) {
   // EDIT ORDERS
 
   async function handleCutItem(
+    orderId: string,
+    itemId: any,
     orderIndex: number,
     foodItemsIndex: number,
     productIndex: number,
@@ -360,12 +369,14 @@ function Home({ isActive }) {
     Id: string
   ) {
     let data = JSON.parse(JSON.stringify(orders));
-
     data[orderIndex][orderType][foodItemsIndex].product[productIndex].include =
       value;
 
     setOrders(data);
     ghostOrders = data;
+    //REDUX PART
+    console.log(orderId, itemId._id);
+    dispatch(getProductItems([orderId, itemId._id]));
 
     // await storeController
     //   .updateOrder({ _id: Id, body: data[orderIndex] })
@@ -382,6 +393,7 @@ function Home({ isActive }) {
 
   // API FOR ACCEPT ORDER BY CHEF
   async function handleAcceptOrder(obj: Record<string, any>, index: number) {
+    dispatch(setNotifyOrders(obj));
     setNotifyLoading(true);
     setBtnIndex(index);
     await storeController
@@ -436,7 +448,7 @@ function Home({ isActive }) {
     };
   }, []);
 
-  console.log(orders, "<<<<<");
+  // console.log(orders, "<<<<<");
 
   return (
     <>
@@ -490,6 +502,7 @@ function Home({ isActive }) {
                         orderStatus.status == "ready_to_pick_up" ||
                         (orderStatus.status == "completed" && orderStatus)
                     );
+
                     return (
                       <React.Fragment key={orderIndex}>
                         {ele?.order_type
@@ -658,7 +671,13 @@ function Home({ isActive }) {
                                                       sx={{
                                                         marginBottom: "0px",
                                                         textDecoration:
-                                                          productItem?.include
+                                                          productItem?.include ||
+                                                          notifiedOrder[
+                                                            ele.order_id
+                                                          ]?.includes(
+                                                            productItem.product
+                                                              ._id
+                                                          )
                                                             ? "line-through"
                                                             : "none",
                                                         marginTop:
@@ -680,6 +699,8 @@ function Home({ isActive }) {
                                                             color="warning"
                                                             onChange={() =>
                                                               handleCutItem(
+                                                                ele.order_id,
+                                                                productItem.product,
                                                                 orderIndex,
                                                                 foodItemsIndex,
                                                                 productIndex,
@@ -796,7 +817,7 @@ function Home({ isActive }) {
                                                         {productItem
                                                           ?.selected_pizza_variants
                                                           .size?.data?.topping
-                                                          .length > 0 && (
+                                                          ?.length > 0 && (
                                                           <Grid item xs={12}>
                                                             {productItem?.selected_pizza_variants.size?.data?.topping?.map(
                                                               (

@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import persistReducer from "redux-persist/es/persistReducer";
 import OrderSlice from "./Slices/OrderSlice";
 import StoreSlice from "./Slices/StoreSlice";
+import NotifyOrdersSlice from "./Slices/OrderNotify";
 import {
   FLUSH,
   PAUSE,
@@ -21,6 +22,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   orders: OrderSlice,
   store: StoreSlice,
+  notifyOrders: NotifyOrdersSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
