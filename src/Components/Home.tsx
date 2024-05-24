@@ -318,7 +318,7 @@ function Home({ isActive }) {
   // UPDATE CHANNEL OF SOCKET
   function updateOrder() {
     socket.on("updated_order", (data) => {
-      // console.log(data, "data");
+      console.log(data, "data");
       let orderData = JSON.parse(JSON.stringify(ghostOrders));
       let found: number = orderData.findIndex(
         (ele: Record<string, any>, index: number) => ele._id == data._id
@@ -436,7 +436,7 @@ function Home({ isActive }) {
     };
   }, []);
 
-  // console.log(orders, "<<<<<");
+  console.log(orders, "<<<<<");
 
   return (
     <>
@@ -662,30 +662,34 @@ function Home({ isActive }) {
                                                             ? "line-through"
                                                             : "none",
                                                         marginTop:
-                                                          completeOrdersBtn
+                                                          completeOrdersBtn ||
+                                                          ele.is_new ||
+                                                          foundStatus
                                                             ? "8px"
                                                             : "0px",
                                                       }}
                                                     >
-                                                      {newOrdersBtn && (
-                                                        <Checkbox
-                                                          checked={
-                                                            productItem?.include
-                                                          }
-                                                          size="medium"
-                                                          color="warning"
-                                                          onChange={() =>
-                                                            handleCutItem(
-                                                              orderIndex,
-                                                              foodItemsIndex,
-                                                              productIndex,
-                                                              !productItem?.include,
-                                                              ele?.order_type,
-                                                              ele?._id
-                                                            )
-                                                          }
-                                                        />
-                                                      )}
+                                                      {newOrdersBtn &&
+                                                        !ele.is_new &&
+                                                        !foundStatus && (
+                                                          <Checkbox
+                                                            checked={
+                                                              productItem?.include
+                                                            }
+                                                            size="medium"
+                                                            color="warning"
+                                                            onChange={() =>
+                                                              handleCutItem(
+                                                                orderIndex,
+                                                                foodItemsIndex,
+                                                                productIndex,
+                                                                !productItem?.include,
+                                                                ele?.order_type,
+                                                                ele?._id
+                                                              )
+                                                            }
+                                                          />
+                                                        )}
                                                       <b>
                                                         {productItem?.quantity +
                                                           " x " +
