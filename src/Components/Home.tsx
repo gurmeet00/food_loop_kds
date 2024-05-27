@@ -1044,7 +1044,7 @@ function Home({ isActive }) {
                                                 }
                                               >
                                                 <VisibilitySharpIcon /> &nbsp;
-                                                <b> Order Notifed</b>
+                                                <b> Order Notified</b>
                                               </Button>
                                             </>
                                           )}
